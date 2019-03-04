@@ -64,6 +64,7 @@ function main() {
   // Here's where we call the routine that builds all the
   // objects we'll be drawing.
   const track = Track(gl);
+  const walls = Wall(gl);
 
   var then = 0;
 
@@ -72,7 +73,7 @@ function main() {
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+    gl.clearColor(0.0, 154.0/255.0, 233.0/255.0, 1.0);  // Clear to blue, fully opaque
     gl.clearDepth(1.0);                 // Clear everything
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
@@ -81,6 +82,7 @@ function main() {
   
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     drawTrack(gl, programInfo, track, deltaTime);
+    drawWall(gl, programInfo, walls, deltaTime);
 
     requestAnimationFrame(render);
   }

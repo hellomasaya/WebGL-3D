@@ -1,13 +1,13 @@
-trackRotation = 0.0;
+wallRotation = 0.0;
 cubePositionz = 0.0;
 cubeR = 1.5;
 
-// Track
+// Wall
 //
-// Initialize the track we'll need. For this demo, we just
+// Initialize the wall we'll need. For this demo, we just
 // have one object -- a simple three-dimensional cube.
 //
-function Track(gl) {
+function Wall(gl) {
 
     // Create a buffer for the cube's vertex positions.
   
@@ -19,8 +19,8 @@ function Track(gl) {
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   
     // Now create an array of positions for the cube.
-    var height=1.0;
-    var dx=0.6;
+    var height=3.0;
+    // var dx=0.6;
 
     const positions = [
       // Front face
@@ -32,28 +32,19 @@ function Track(gl) {
         // -height * Math.tan(45 / 2 * Math.PI / 180), -height, 1.0,
         // height * Math.tan(45 / 2 * Math.PI / 180), -height, 1.0,
         // height * Math.tan(45 / 2 * Math.PI / 180), -height, -330.0,
-               //grass
-               -3.0+dx, -height, -1.0,
-               -3.0+dx, -height, 1.0,
-               3.0-dx, -height, 1.0,
-               3.0-dx, -height, -1.0,
+       
+        //left and right wall
 
-        //left and right track
-        -2.0+dx, -height, -1.0,
-        -2.0+dx, -height, 1.0,
-        -1.0+dx-0.1, -height, 1.0,
-        -1.0+dx-0.1, -height, -1.0,
+    // Face 3
+    height, height * Math.tan(45 / 2 * Math.PI / 180), -1.0,
+    height, height * Math.tan(45 / 2 * Math.PI / 180), 1.0,
+    height, -height * Math.tan(45 / 2 * Math.PI / 180), 1.0,
+    height, -height * Math.tan(45 / 2 * Math.PI / 180), -1.0,
 
-        2.0-dx, -height, -1.0,
-        2.0-dx, -height, 1.0,
-        1.0-dx+0.1, -height, 1.0,
-        1.0-dx+0.1, -height, -1.0,
-
-        //middle track
-        -1.0+dx, -height, -1.0,
-        -1.0+dx, -height, 1.0,
-        1.0-dx, -height, 1.0,
-        1.0-dx, -height, -1.0,
+    -height, height * Math.tan(45 / 2 * Math.PI / 180), -1.0,
+    -height, height * Math.tan(45 / 2 * Math.PI / 180), 1.0,
+    -height, -height * Math.tan(45 / 2 * Math.PI / 180), 1.0,
+    -height, -height * Math.tan(45 / 2 * Math.PI / 180), -1.0,
 
     ];
   
@@ -67,10 +58,13 @@ function Track(gl) {
     // for each face.
   
     const faceColors = [
-    [40.0/255.0,  143.0/255.0,  54.0/255.0,  1.0],    // Front face: white
-    [67/255,  61/255,  53/255,  1.0],    // Back face: dark brown
-    [67/255,  61/255,  53/255,  1.0],    // Back face: dark brown
-    [87/255,  77/255,  62/255,  1.0],    // Back face: brown
+    //   [1.0,  1.0,  1.0,  1.0],    // Front face: white
+    // [185/255,  127/255,  43/255,  1.0],    // Back face: dark brown
+    // [185/255,  127/255,  43/255,  1.0],    // Back face: dark brown
+    [29/255,  32/255,  38/255,  1.0],    // Back face: brown
+    [29/255,  32/255,  38/255,  1.0],    // Back face: brown
+    // [203/255,  151/255,  59/255,  1.0],    // Back face: brown
+    // [203/255,  151/255,  59/255,  1.0],    // Back face: brown
 
 ];
     // var colors = [
@@ -106,10 +100,10 @@ function Track(gl) {
     // position.
   
     const indices = [
-      0,  1,  2,      0,  2,  3,    // middle
-      4,  5,  6,      4,  6,  7,    // left
-      8,  9,  10,     8,  10, 11,   // right
-      12, 13, 14,     12, 14, 15,   // grass
+      0,  1,  2,      0,  2,  3,    // front
+      4,  5,  6,      4,  6,  7,    // back
+    //   8,  9,  10,     8,  10, 11,   // top
+    //   12, 13, 14,     12, 14, 15,   // bottom
     //   16, 17, 18,     16, 18, 19,   // right
     //   20, 21, 22,     20, 22, 23,   // left
     ];
@@ -126,7 +120,7 @@ function Track(gl) {
     };
   }
 
-  function drawTrack(gl, programInfo, track, deltaTime) {
+  function drawWall(gl, programInfo, wall, deltaTime) {
     // Create a perspective matrix, a special matrix that is
     // used to simulate the distortion of perspective in a camera.
     // Our field of view is 45 degrees, with a width/height
@@ -170,7 +164,7 @@ function Track(gl) {
             modelViewMatrix,     // matrix to translate
             [-0.0, 0.0, cubeTranslate - i*2]);  // amount to translate
         //Write your code to Rotate the cube here//
-        // mat4.rotate(modelViewMatrix, modelViewMatrix, trackRotation * .7, [0, 1, 0]);
+        // mat4.rotate(modelViewMatrix, modelViewMatrix, wallRotation * .7, [0, 1, 0]);
     
         // Tell WebGL how to pull out the positions from the position
         // buffer into the vertexPosition attribute
@@ -180,7 +174,7 @@ function Track(gl) {
         const normalize = false;
         const stride = 0;
         const offset = 0;
-        gl.bindBuffer(gl.ARRAY_BUFFER, track.position);
+        gl.bindBuffer(gl.ARRAY_BUFFER, wall.position);
         gl.vertexAttribPointer(
             programInfo.attribLocations.vertexPosition,
             numComponents,
@@ -200,7 +194,7 @@ function Track(gl) {
         const normalize = false;
         const stride = 0;
         const offset = 0;
-        gl.bindBuffer(gl.ARRAY_BUFFER, track.color);
+        gl.bindBuffer(gl.ARRAY_BUFFER, wall.color);
         gl.vertexAttribPointer(
             programInfo.attribLocations.vertexColor,
             numComponents,
@@ -213,7 +207,7 @@ function Track(gl) {
         }
     
         // Tell WebGL which indices to use to index the vertices
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, track.indices);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, wall.indices);
     
         // Tell WebGL to use our program when drawing
     
@@ -231,7 +225,7 @@ function Track(gl) {
             modelViewMatrix);
     
         {
-        const vertexCount = 24;
+        const vertexCount = 12;
         const type = gl.UNSIGNED_SHORT;
         const offset = 0;
         gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
@@ -239,7 +233,7 @@ function Track(gl) {
     
         // Update the rotation for the next draw
     
-        // trackRotation += deltaTime;
+        // wallRotation += deltaTime;
         cubePositionz += deltaTime;
     }
   }
