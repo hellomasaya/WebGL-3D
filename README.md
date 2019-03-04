@@ -1,4 +1,4 @@
-Assignment 3 - Sun=bway Surfer
+Assignment 3 - Subway Surfer
 =============
 
 ## Harshita Sharma(20171099)
