@@ -1,15 +1,15 @@
 trackRotation = 0.0;
-cubePositionz = 0.0;
-cubeR = 1.5;
+// cameraPositionz = 0.0;
+// cameraR = 1.5;
 
 // Track
 //
 // Initialize the track we'll need. For this demo, we just
-// have one object -- a simple three-dimensional cube.
+// have one object -- a simple three-dimensional camera.
 //
 function Track(gl) {
 
-    // Create a buffer for the cube's vertex positions.
+    // Create a buffer for the camera's vertex positions.
   
     const positionBuffer = gl.createBuffer();
   
@@ -17,8 +17,7 @@ function Track(gl) {
     // operations to from here out.
   
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  
-    // Now create an array of positions for the cube.
+    // Now create an array of positions for the camera.
     var height=1.0;
     var dx=0.6;
 
@@ -39,15 +38,15 @@ function Track(gl) {
                3.0-dx, -height, -1.0,
 
         //left and right track
-        -2.0+dx, -height, -1.0,
-        -2.0+dx, -height, 1.0,
-        -1.0+dx-0.1, -height, 1.0,
-        -1.0+dx-0.1, -height, -1.0,
+        -2.3+dx, -height, -1.0,
+        -2.3+dx, -height, 1.0,
+        -1.3+dx-0.1, -height, 1.0,
+        -1.3+dx-0.1, -height, -1.0,
 
-        2.0-dx, -height, -1.0,
-        2.0-dx, -height, 1.0,
-        1.0-dx+0.1, -height, 1.0,
-        1.0-dx+0.1, -height, -1.0,
+        2.3-dx, -height, -1.0,
+        2.3-dx, -height, 1.0,
+        1.3-dx+0.1, -height, 1.0,
+        1.3-dx+0.1, -height, -1.0,
 
         //middle track
         -1.0+dx, -height, -1.0,
@@ -156,20 +155,21 @@ function Track(gl) {
         // Now move the drawing position a bit to where we want to
         // start drawing the square.
     
-        // mat4.translate(modelViewMatrix,     // destination matrix
-        //             modelViewMatrix,     // matrix to translate
-        //             // [-0.0, 0.0, -6.0]);  // amount to translate
-        //             [0.0, cubeR, 0.0]);  // amount to translate
+        //when i air increase cameraR
+        mat4.translate(modelViewMatrix,     // destination matrix
+                    modelViewMatrix,     // matrix to translate
+                    // [-0.0, 0.0, -6.0]);  // amount to translate
+                    [0.0, -cameraR, 0.0]);  // amount to translate
         
-        var cubeTranslate = cubePositionz;
-        while (cubeTranslate >= 16) {
-            cubeTranslate -= 16;
+        var cameraTranslate = cameraPositionz;
+        while (cameraTranslate >= 16) {
+            cameraTranslate -= 16;
         }
 
         mat4.translate(modelViewMatrix,     // destination matrix
             modelViewMatrix,     // matrix to translate
-            [-0.0, 0.0, cubeTranslate - i*2]);  // amount to translate
-        //Write your code to Rotate the cube here//
+            [-0.0, 0.0, cameraTranslate - i*2]);  // amount to translate
+        //Write your code to Rotate the camera here//
         // mat4.rotate(modelViewMatrix, modelViewMatrix, trackRotation * .7, [0, 1, 0]);
     
         // Tell WebGL how to pull out the positions from the position
@@ -240,7 +240,7 @@ function Track(gl) {
         // Update the rotation for the next draw
     
         // trackRotation += deltaTime;
-        cubePositionz += deltaTime;
+        // cameraPositionz += deltaTime;
     }
   }
   

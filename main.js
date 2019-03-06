@@ -1,3 +1,4 @@
+// var lane =0;
 main();
 
 //
@@ -65,6 +66,51 @@ function main() {
   // objects we'll be drawing.
   const track = Track(gl);
   const walls = Wall(gl);
+  const player = Player(gl, -5.0);
+  const camera = Camera(gl);
+  var pillars = [];
+  var trains = [];
+  var coinss = [];
+  var coinssl = [];
+  var coinssr = [];
+  var stopblock = [];
+  var stoppass = [];
+  var trafficlights = [];
+
+  for (var i = 40; i <= 1040; i += 20) {
+    var rand = (Math.random() * (10) - 5);
+    if (rand < 0) {
+        coinss.push(Coin(gl, -i));
+    }
+    else {
+      coinssl.push(Coinl(gl, -i));
+      coinssr.push(Coinr(gl, -i));
+    }
+  }
+
+  for (var i = 40; i <= 1100; i += 150) {
+    var rand = (Math.random() * (10) - 5);
+    if (rand < 0) {
+      pillars.push(Pillar(gl, -i));
+    }
+    else{
+      trafficlights.push(Trafficlight(gl, -i));
+    }
+  }
+
+  for (var i = 60; i <= 1040; i += 10) {
+    // console.log(lane);
+    var rand = (Math.random() * (10));
+    if (rand > 0 && rand < 3) {
+        stopblock.push(Stopblock(gl, -i));
+    }
+    else if(rand > 3 && rand < 6){
+        stoppass.push(Stoppass(gl, -i));
+    }
+    else if(rand >6 && i%60==0){
+      trains.push(Train(gl,-i));
+    }
+  }
 
   var then = 0;
 
@@ -83,6 +129,39 @@ function main() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     drawTrack(gl, programInfo, track, deltaTime);
     drawWall(gl, programInfo, walls, deltaTime);
+    drawPlayer(gl, programInfo, player, deltaTime);
+    drawCamera(gl, programInfo, camera, deltaTime);
+    for (j = 0; j < coinss.length; ++j) {
+      drawCoins(gl, programInfo, coinss[j], deltaTime);
+    }
+
+    for (j = 0; j < coinssl.length; ++j) {
+      drawCoinsl(gl, programInfo, coinssl[j], deltaTime);
+    }
+
+    for (j = 0; j < coinssr.length; ++j) {
+      drawCoinsr(gl, programInfo, coinssr[j], deltaTime);
+    }
+
+    for (j = 0; j < pillars.length; ++j) {
+      drawPillars(gl, programInfo, pillars[j], deltaTime);
+    }
+
+    for (j = 0; j < stopblock.length; ++j) {
+      drawStopblock(gl, programInfo, stopblock[j], deltaTime);
+    }
+
+    for (j = 0; j < stoppass.length; ++j) {
+      drawStoppass(gl, programInfo, stoppass[j], deltaTime);
+    }
+
+    for (j = 0; j < trains.length; ++j) {
+      drawTrains(gl, programInfo, trains[j], deltaTime);
+    }
+
+    for (j = 0; j < trafficlights.length; ++j) {
+      drawTrafficlights(gl, programInfo, trafficlights[j], deltaTime);
+    }
 
     requestAnimationFrame(render);
   }
