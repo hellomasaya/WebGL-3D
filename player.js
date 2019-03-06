@@ -1,3 +1,9 @@
+var playerX=0.0;
+var playerY=0.0;
+var playerR=0.0;
+duckTimer =0.0;
+gravity = 0.02;
+
 function Player(gl, zl) {
 
     // Create a buffer for the camera's vertex positions.
@@ -125,6 +131,23 @@ function Player(gl, zl) {
 }
 
 function drawPlayer(gl, programInfo, buffers, deltaTime) {
+
+    if (playerY > 0.0){
+        playerY -= gravity;
+    }
+
+    if(playerY <= 0){
+        playerY =0.0;
+    }
+    if(playerR !=0){
+        duckTimer+=0.1;
+    }
+
+    if(duckTimer>=2.0){
+        playerR=0.0;
+        duckTimer=0.0;
+    }
+
     // while(buffers.a<0)
     // {
     //     buffers.a += Math.PI;
@@ -175,12 +198,12 @@ function drawPlayer(gl, programInfo, buffers, deltaTime) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [-0.0, 0.0, buffers.z]);  // amount to translate
+        [playerX, playerY, buffers.z]);  // amount to translate
 
-    // mat4.rotate(modelViewMatrix,  // destination matrix
-    //     modelViewMatrix,  // matrix to rotate
-    //     buffers.a+tunnelRotation-cameraA,     // amount to rotate in radians
-    //     [0, 0, 1]);       // axis to rotate around (Z)
+    mat4.rotate(modelViewMatrix,  // destination matrix
+        modelViewMatrix,  // matrix to rotate
+        playerR,     // amount to rotate in radians
+        [1, 0, 0]);       // axis to rotate around (Z)
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     tunnelRotation,// amount to rotate in radians

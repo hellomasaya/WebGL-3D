@@ -108,7 +108,7 @@ function Trafficlight(gl, zl) {
 
     // theta = Math.random() * (Math.PI);
     // speed = (Math.random() * (10)-5);
-    lane = Math.floor((Math.random() * (3))); //lane 0=middle or 1=right or 2=left
+    lane = Math.floor((Math.random() * (2)+1)); //1=right or 2=left
     if (lane==1) lane =1.2;
     if (lane==2) lane =-1.2;
 

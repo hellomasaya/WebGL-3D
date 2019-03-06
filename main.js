@@ -113,10 +113,26 @@ function main() {
   }
 
   var then = 0;
-  Mousetrap.bind('a', function () {
-    // cubeA -= 0.06;
-    console.log("a pressed");
+  Mousetrap.bind('left', function () {
+    if(playerX>=0.0)
+      playerX += -1.2;
   });
+
+  Mousetrap.bind('right', function () {
+    if(playerX<=0.0)
+      playerX += 1.2;
+  });
+
+  Mousetrap.bind('space', function () {
+    if(playerY==0.0)
+    playerY += 1.0;
+  });
+
+  Mousetrap.bind('down', function () {
+    if(playerR==0.0)
+    playerR += 1.57;
+  });
+
   // Draw the scene repeatedly
   function render(now) {
     now *= 0.001;  // convert to seconds

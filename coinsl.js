@@ -247,7 +247,7 @@ function drawCoinsl(gl, programInfo, buffers, deltaTime) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [-0.3, cameraR-2.27, 0]);  // amount to translate
+        [-0.05, cameraR-2.37, 0]);  // amount to translate
 
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
@@ -260,7 +260,7 @@ function drawCoinsl(gl, programInfo, buffers, deltaTime) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
+        [0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
 
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
