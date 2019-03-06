@@ -113,7 +113,10 @@ function main() {
   }
 
   var then = 0;
-
+  Mousetrap.bind('a', function () {
+    // cubeA -= 0.06;
+    console.log("a pressed");
+  });
   // Draw the scene repeatedly
   function render(now) {
     now *= 0.001;  // convert to seconds
