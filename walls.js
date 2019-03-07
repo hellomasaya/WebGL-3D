@@ -8,6 +8,44 @@ wallRotation = 0.0;
 // have one object -- a simple three-dimensional camera.
 //
 function Wall(gl) {
+    const textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+  
+    const textureCoordinates = [
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Back
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Top
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Bottom
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Right
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Left
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+    ];
+  
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+                  gl.STATIC_DRAW);
 
     // Create a buffer for the camera's vertex positions.
   
@@ -117,6 +155,7 @@ function Wall(gl) {
       position: positionBuffer,
       color: colorBuffer,
       indices: indexBuffer,
+      textureCoord: textureCoordBuffer,
     };
   }
 
@@ -225,6 +264,127 @@ function Wall(gl) {
             false,
             modelViewMatrix);
     
+        {
+        const vertexCount = 12;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+        }
+    
+        // Update the rotation for the next draw
+    
+        // wallRotation += deltaTime;
+        // cameraPositionz += deltaTime;
+    }
+  }
+
+
+  function drawWallTexture(gl, programInfo, wall, deltaTime, wallTexture) {
+    // Create a perspective matrix, a special matrix that is
+    // used to simulate the distortion of perspective in a camera.
+    // Our field of view is 45 degrees, with a width/height
+    // ratio that matches the display size of the canvas
+    // and we only want to see objects between 0.1 units
+    // and 100 units away from the camera.
+  
+    const fieldOfView = 45 * Math.PI / 180;   // in radians
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const zNear = 0.1;
+    const zFar = 70.0;
+    const projectionMatrix = mat4.create();
+  
+    // note: glmatrix.js always has the first argument
+    // as the destination to receive the result.
+    mat4.perspective(projectionMatrix,
+                     fieldOfView,
+                     aspect,
+                     zNear,
+                     zFar);
+    
+    for (var i = 0; i < 300; i++) {
+        // Set the drawing position to the "identity" point, which is
+        // the center of the scene.
+        const modelViewMatrix = mat4.create();
+    
+        // Now move the drawing position a bit to where we want to
+        // start drawing the square.
+        
+        //when player in air increser cameraR
+        mat4.translate(modelViewMatrix,     // destination matrix
+                    modelViewMatrix,     // matrix to translate
+                    // [-0.0, 0.0, -6.0]);  // amount to translate
+                    [0.0, -cameraR, 0.0]);  // amount to translate
+        
+        var cameraTranslate = cameraPositionz;
+        while (cameraTranslate >= 16) {
+            cameraTranslate -= 16;
+        }
+
+        mat4.translate(modelViewMatrix,     // destination matrix
+            modelViewMatrix,     // matrix to translate
+            [-0.0, 0.0, cameraTranslate - i*2]);  // amount to translate
+        //Write your code to Rotate the camera here//
+        // mat4.rotate(modelViewMatrix, modelViewMatrix, wallRotation * .7, [0, 1, 0]);
+    
+        // Tell WebGL how to pull out the positions from the position
+        // buffer into the vertexPosition attribute
+        {
+        const numComponents = 3;
+        const type = gl.FLOAT;
+        const normalize = false;
+        const stride = 0;
+        const offset = 0;
+        gl.bindBuffer(gl.ARRAY_BUFFER, wall.position);
+        gl.vertexAttribPointer(
+            programInfo.attribLocations.vertexPosition,
+            numComponents,
+            type,
+            normalize,
+            stride,
+            offset);
+        gl.enableVertexAttribArray(
+            programInfo.attribLocations.vertexPosition);
+        }
+    
+        // tell webgl how to pull out the texture coordinates from buffer
+        {
+            const num = 2; // every coordinate composed of 2 values
+            const type = gl.FLOAT; // the data in the buffer is 32 bit float
+            const normalize = false; // don't normalize
+            const stride = 0; // how many bytes to get from one set to the next
+            const offset = 0; // how many bytes inside the buffer to start from
+            gl.bindBuffer(gl.ARRAY_BUFFER, wall.textureCoord);
+            gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
+            gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+        }
+    
+        // Tell WebGL which indices to use to index the vertices
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, wall.indices);
+    
+        // Tell WebGL to use our program when drawing
+    
+        gl.useProgram(programInfo.program);
+    
+        // Set the shader uniforms
+    
+        gl.uniformMatrix4fv(
+            programInfo.uniformLocations.projectionMatrix,
+            false,
+            projectionMatrix);
+        gl.uniformMatrix4fv(
+            programInfo.uniformLocations.modelViewMatrix,
+            false,
+            modelViewMatrix);
+    
+        // Tell WebGL we want to affect texture unit 0
+        gl.activeTexture(gl.TEXTURE0);
+
+        // Bind the texture to texture unit 0
+        gl.bindTexture(gl.TEXTURE_2D, wallTexture);
+
+        // Tell the shader we bound the texture to texture unit 0
+        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+
         {
         const vertexCount = 12;
         const type = gl.UNSIGNED_SHORT;

@@ -1,10 +1,13 @@
 // var lane =0;
+// wallTexture;
 main();
 
 //
 // Start here
 //
 function main() {
+  sub = document.getElementById("music");
+  sub.play();
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
@@ -42,9 +45,50 @@ function main() {
     }
   `;
 
+  const vsSourceTexture = `
+  attribute vec4 aVertexPosition;
+  // attribute vec3 aVertexNormal;
+  attribute vec2 aTextureCoord;
+
+  // uniform mat4 uNormalMatrix;
+  uniform mat4 uModelViewMatrix;
+  uniform mat4 uProjectionMatrix;
+
+  varying highp vec2 vTextureCoord;
+  // varying highp vec3 vLighting;
+
+  void main(void) {
+    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    vTextureCoord = aTextureCoord;
+
+    // Apply lighting effect
+
+    // highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+    // highp vec3 directionalLightColor = vec3(1, 1, 1);
+    // highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
+
+    // highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+
+    // highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+    // vLighting = ambientLight + (directionalLightColor * directional);
+  }
+`;
+
+  const fsSourceTexture = `
+  varying highp vec2 vTextureCoord;
+
+  uniform sampler2D uSampler;
+
+  void main(void) {
+    gl_FragColor = texture2D(uSampler, vTextureCoord);
+  }
+  `;
+
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
   const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+  const shaderProgramTex = initShaderProgram(gl, vsSourceTexture, fsSourceTexture);
+
 
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
@@ -62,8 +106,22 @@ function main() {
     },
   };
 
+  const programInfoTexture = {
+    program: shaderProgramTex,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgramTex, 'aVertexPosition'),
+      textureCoord: gl.getAttribLocation(shaderProgramTex, 'aTextureCoord'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgramTex, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramTex, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgramTex, 'uSampler'),
+    },
+  };
+
   // Here's where we call the routine that builds all the
   // objects we'll be drawing.
+  var tex = false;
   const track = Track(gl);
   const walls = Wall(gl);
   const player = Player(gl, -5.0);
@@ -76,6 +134,7 @@ function main() {
   var stopblock = [];
   var stoppass = [];
   var trafficlights = [];
+  const wallTexture = loadTexture(gl, './images/track1.png');
 
   for (var i = 40; i <= 1040; i += 20) {
     var rand = (Math.random() * (10) - 5);
@@ -107,7 +166,7 @@ function main() {
     else if(rand > 3 && rand < 6){
         stoppass.push(Stoppass(gl, -i));
     }
-    else if(rand >6 && i%60==0){
+    else if(rand >6 && i%50==0){
       trains.push(Train(gl,-i));
     }
   }
@@ -133,6 +192,11 @@ function main() {
     playerR += 1.57;
   });
 
+  Mousetrap.bind('t', function () {
+    tex = ~tex;
+    console.log(tex);
+  });
+
   // Draw the scene repeatedly
   function render(now) {
     now *= 0.001;  // convert to seconds
@@ -146,8 +210,13 @@ function main() {
     // Clear the canvas before we start drawing on it.
   
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    //wall
     drawTrack(gl, programInfo, track, deltaTime);
-    drawWall(gl, programInfo, walls, deltaTime);
+    if (tex)
+        drawWallTexture(gl, programInfoTexture, walls, deltaTime, wallTexture);
+    else
+        drawWall(gl, programInfo, walls, deltaTime);
+
     drawPlayer(gl, programInfo, player, deltaTime);
     drawCamera(gl, programInfo, camera, deltaTime);
     for (j = 0; j < coinss.length; ++j) {

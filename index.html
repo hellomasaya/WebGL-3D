@@ -4,14 +4,23 @@
     <meta charset="utf-8">
     <title>Subway Surfer</title>
     <link rel="stylesheet" href="./subway.css" type="text/css">
+    <link rel="stylesheet" href="bootstrap.min.css" type="text/css">
   </head>
 
   <body style = "align-content: center;">
+    <div> 
+      <!-- <br><button type="button" id = "score" class="btn btn-primary btn-lg">Score: 0</button><br><br> -->
+    </div>
     <canvas id="glcanvas" width="800" height="660"></canvas>
+    <audio id = "music" >
+      <source src = 'audio/subway.mp3'  type="audio/mpeg">
+    </audio>
+<!-- <audio src = './crash.mp3' id = "crash"></audio> -->
   </body>
 
   <script src="./gl-matrix.js"></script>
   <script src="./mousetrap.min.js"></script>
+  <script src="loadTexture.js"></script>
   <script src="camera.js"></script>
   <script src="track.js"></script>
   <script src="walls.js"></script>
