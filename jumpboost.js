@@ -1,4 +1,4 @@
-function Stopblock(gl, zl) {
+function Jumpboost(gl, zl) {
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -51,40 +51,40 @@ function Stopblock(gl, zl) {
 
     const positions = [
         // Front face
-        -0.4,-2.5,  0.09,
-        0.4,-2.5,  0.09,
-        0.4, 0.3,  0.09,
-        -0.4, 0.3,  0.09,
+        -0.12, -0.12,  0.12,
+        0.12, -0.12,  0.12,
+        0.12,  0.12,  0.12,
+        -0.12,  0.12,  0.12,
 
         // Back face
-        -0.4,-2.5, -0.09,
-        -0.4, 0.3, -0.09,
-        0.4, 0.3, -0.09,
-        0.4,-2.5, -0.09,
+        -0.12, -0.12, -0.12,
+        -0.12,  0.12, -0.12,
+        0.12,  0.12, -0.12,
+        0.12, -0.12, -0.12,
 
         // Top face
-        -0.4, 0.3, -0.09,
-        -0.4, 0.3,  0.09,
-        0.4, 0.3,  0.09,
-        0.4, 0.3, -0.09,
+        -0.12,  0.12, -0.12,
+        -0.12,  0.12,  0.12,
+        0.12,  0.12,  0.12,
+        0.12,  0.12, -0.12,
 
         // Bottom face
-        -0.4,-2.5, -0.09,
-        0.4,-2.5, -0.09,
-        0.4,-2.5,  0.09,
-        -0.4,-2.5,  0.09,
+        -0.12, -0.12, -0.12,
+        0.12, -0.12, -0.12,
+        0.12, -0.12,  0.12,
+        -0.12, -0.12,  0.12,
 
         // Right face
-        0.4,-2.5, -0.09,
-        0.4, 0.3, -0.09,
-        0.4, 0.3,  0.09,
-        0.4,-2.5,  0.09,
+        0.12, -0.12, -0.12,
+        0.12,  0.12, -0.12,
+        0.12,  0.12,  0.12,
+        0.12, -0.12,  0.12,
 
         // Left face
-        -0.4,-2.5, -0.09,
-        -0.4,-2.5,  0.09,
-        -0.4, 0.3,  0.09,
-        -0.4, 0.3, -0.09,
+        -0.12, -0.12, -0.12,
+        -0.12, -0.12,  0.12,
+        -0.12,  0.12,  0.12,
+        -0.12,  0.12, -0.12,
     ];
 
     // Now pass the list of positions into WebGL to build the
@@ -98,12 +98,13 @@ function Stopblock(gl, zl) {
 
     const faceColors = [
     // Front face: white
-        [38/255,  49/255,  85/255,  1.0],    // Front face: white
-        [38/255,  49/255,  85/255,  1.0], 
-        [72/255,  94/255,  140/255,  1.0],    // Front face: white
-        [72/255,  94/255,  140/255,  1.0],        
-        [72/255,  94/255,  140/255,  1.0],    // Front face: white
-        [72/255,  94/255,  140/255,  1.0],   // Front face: white
+    [1.0,  1.0,  1.0,  1.0],    // Front face: white
+    [1.0,  1.0,  1.0,  1.0],    // Front face: white
+    [1.0,  1.0,  1.0,  1.0],    // Front face: white
+    [1.0,  1.0,  1.0,  1.0],    // Front face: white
+    [1.0,  1.0,  1.0,  1.0],    // Front face: white
+    [1.0,  1.0,  1.0,  1.0],    // Front face: white
+
     // Front face: white
   // Front face: white
 
@@ -167,7 +168,7 @@ function Stopblock(gl, zl) {
     };
 }
 
-function drawStopblock(gl, programInfo, buffers, deltaTime) {
+function drawJumpboost(gl, programInfo, buffers, deltaTime) {
     // while(buffers.a<0)
     // {
     //     buffers.a += Math.PI;
@@ -215,7 +216,7 @@ function drawStopblock(gl, programInfo, buffers, deltaTime) {
 //when player in air cameraR stays same 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [0, cameraR-2.27, 0]);  // amount to translate
+        [0, cameraR-2.27, 1.5]);  // amount to translate
 
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
@@ -309,7 +310,7 @@ function drawStopblock(gl, programInfo, buffers, deltaTime) {
 }
 
 
-function drawStopblockTexture(gl, programInfo, buffers, deltaTime, blockTexture) {
+function drawJumpboostTexture(gl, programInfo, buffers, deltaTime, jumpTexture) {
     // while(buffers.a<0)
     // {
     //     buffers.a += Math.PI;
@@ -347,7 +348,7 @@ function drawStopblockTexture(gl, programInfo, buffers, deltaTime, blockTexture)
 //when player in air cameraR stays same 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [0, cameraR-2.27, 0]);  // amount to translate
+        [0, cameraR-2.27, 1.5]);  // amount to translate
     
     mat4.translate(modelViewMatrix,     // destination matrix
             modelViewMatrix,     // matrix to translate
@@ -438,7 +439,7 @@ function drawStopblockTexture(gl, programInfo, buffers, deltaTime, blockTexture)
         gl.activeTexture(gl.TEXTURE0);
 
         // Bind the texture to texture unit 0
-        gl.bindTexture(gl.TEXTURE_2D, blockTexture);
+        gl.bindTexture(gl.TEXTURE_2D, jumpTexture);
 
         // Tell the shader we bound the texture to texture unit 0
         gl.uniform1i(programInfo.uniformLocations.uSampler, 0);

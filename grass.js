@@ -1,13 +1,13 @@
-trackRotation = 0.0;
+grassRotation = 0.0;
 // cameraPositionz = 0.0;
 // cameraR = 1.5;
 
-// Track
+// Grass
 //
-// Initialize the track we'll need. For this demo, we just
+// Initialize the grass we'll need. For this demo, we just
 // have one object -- a simple three-dimensional camera.
 //
-function Track(gl) {
+function Grass(gl) {
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -71,27 +71,27 @@ function Track(gl) {
         // height * Math.tan(45 / 2 * Math.PI / 180), -height, 1.0,
         // height * Math.tan(45 / 2 * Math.PI / 180), -height, -330.0,
             //    //grass
-            //    -3.0+dx, -height, -1.0,
-            //    -3.0+dx, -height, 1.0,
-            //    3.0-dx, -height, 1.0,
-            //    3.0-dx, -height, -1.0,
+               -3.0+dx, -height, -1.0,
+               -3.0+dx, -height, 1.0,
+               3.0-dx, -height, 1.0,
+               3.0-dx, -height, -1.0,
 
-        //left and right track
-        -2.3+dx, -height, -1.0,
-        -2.3+dx, -height, 1.0,
-        -1.3+dx-0.1, -height, 1.0,
-        -1.3+dx-0.1, -height, -1.0,
+        // //left and right
+        // -2.3+dx, -height, -1.0,
+        // -2.3+dx, -height, 1.0,
+        // -1.3+dx-0.1, -height, 1.0,
+        // -1.3+dx-0.1, -height, -1.0,
 
-        2.3-dx, -height, -1.0,
-        2.3-dx, -height, 1.0,
-        1.3-dx+0.1, -height, 1.0,
-        1.3-dx+0.1, -height, -1.0,
+        // 2.3-dx, -height, -1.0,
+        // 2.3-dx, -height, 1.0,
+        // 1.3-dx+0.1, -height, 1.0,
+        // 1.3-dx+0.1, -height, -1.0,
 
-        //middle track
-        -1.0+dx, -height, -1.0,
-        -1.0+dx, -height, 1.0,
-        1.0-dx, -height, 1.0,
-        1.0-dx, -height, -1.0,
+        // //middle
+        // -1.0+dx, -height, -1.0,
+        // -1.0+dx, -height, 1.0,
+        // 1.0-dx, -height, 1.0,
+        // 1.0-dx, -height, -1.0,
 
     ];
   
@@ -105,10 +105,10 @@ function Track(gl) {
     // for each face.
   
     const faceColors = [
-    // [40.0/255.0,  143.0/255.0,  54.0/255.0,  1.0],    // Front face: white
-    [67/255,  61/255,  53/255,  1.0],    // Back face: dark brown
-    [67/255,  61/255,  53/255,  1.0],    // Back face: dark brown
-    [87/255,  77/255,  62/255,  1.0],    // Back face: brown
+    [40.0/255.0,  143.0/255.0,  54.0/255.0,  1.0],    // Front face: white
+    // [67/255,  61/255,  53/255,  1.0],    // Back face: dark brown
+    // [67/255,  61/255,  53/255,  1.0],    // Back face: dark brown
+    // [87/255,  77/255,  62/255,  1.0],    // Back face: brown
 
 ];
     // var colors = [
@@ -145,8 +145,8 @@ function Track(gl) {
   
     const indices = [
       0,  1,  2,      0,  2,  3,    // middle
-      4,  5,  6,      4,  6,  7,    // left
-      8,  9,  10,     8,  10, 11,   // right
+    //   4,  5,  6,      4,  6,  7,    // left
+    //   8,  9,  10,     8,  10, 11,   // right
     //   12, 13, 14,     12, 14, 15,   // grass
     //   16, 17, 18,     16, 18, 19,   // right
     //   20, 21, 22,     20, 22, 23,   // left
@@ -165,7 +165,7 @@ function Track(gl) {
     };
   }
 
-  function drawTrack(gl, programInfo, track, deltaTime) {
+  function drawGrass(gl, programInfo, grass, deltaTime) {
     // Create a perspective matrix, a special matrix that is
     // used to simulate the distortion of perspective in a camera.
     // Our field of view is 45 degrees, with a width/height
@@ -210,7 +210,7 @@ function Track(gl) {
             modelViewMatrix,     // matrix to translate
             [-0.0, 0.0, cameraTranslate - i*2]);  // amount to translate
         //Write your code to Rotate the camera here//
-        // mat4.rotate(modelViewMatrix, modelViewMatrix, trackRotation * .7, [0, 1, 0]);
+        // mat4.rotate(modelViewMatrix, modelViewMatrix, grassRotation * .7, [0, 1, 0]);
     
         // Tell WebGL how to pull out the positions from the position
         // buffer into the vertexPosition attribute
@@ -220,7 +220,7 @@ function Track(gl) {
         const normalize = false;
         const stride = 0;
         const offset = 0;
-        gl.bindBuffer(gl.ARRAY_BUFFER, track.position);
+        gl.bindBuffer(gl.ARRAY_BUFFER, grass.position);
         gl.vertexAttribPointer(
             programInfo.attribLocations.vertexPosition,
             numComponents,
@@ -240,7 +240,7 @@ function Track(gl) {
         const normalize = false;
         const stride = 0;
         const offset = 0;
-        gl.bindBuffer(gl.ARRAY_BUFFER, track.color);
+        gl.bindBuffer(gl.ARRAY_BUFFER, grass.color);
         gl.vertexAttribPointer(
             programInfo.attribLocations.vertexColor,
             numComponents,
@@ -253,7 +253,7 @@ function Track(gl) {
         }
     
         // Tell WebGL which indices to use to index the vertices
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, track.indices);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, grass.indices);
     
         // Tell WebGL to use our program when drawing
     
@@ -271,7 +271,7 @@ function Track(gl) {
             modelViewMatrix);
     
         {
-        const vertexCount = 18;
+        const vertexCount = 6;
         const type = gl.UNSIGNED_SHORT;
         const offset = 0;
         gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
@@ -279,13 +279,13 @@ function Track(gl) {
     
         // Update the rotation for the next draw
     
-        // trackRotation += deltaTime;
+        // grassRotation += deltaTime;
         // cameraPositionz += deltaTime;
     }
   }
   
 
-  function drawTrackTexture(gl, programInfo, track, deltaTime, trackTexture) {
+  function drawGrassTexture(gl, programInfo, grass, deltaTime, grassTexture) {
     // Create a perspective matrix, a special matrix that is
     // used to simulate the distortion of perspective in a camera.
     // Our field of view is 45 degrees, with a width/height
@@ -340,7 +340,7 @@ function Track(gl) {
         const normalize = false;
         const stride = 0;
         const offset = 0;
-        gl.bindBuffer(gl.ARRAY_BUFFER, track.position);
+        gl.bindBuffer(gl.ARRAY_BUFFER, grass.position);
         gl.vertexAttribPointer(
             programInfo.attribLocations.vertexPosition,
             numComponents,
@@ -359,13 +359,13 @@ function Track(gl) {
             const normalize = false; // don't normalize
             const stride = 0; // how many bytes to get from one set to the next
             const offset = 0; // how many bytes inside the buffer to start from
-            gl.bindBuffer(gl.ARRAY_BUFFER, track.textureCoord);
+            gl.bindBuffer(gl.ARRAY_BUFFER, grass.textureCoord);
             gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
             gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
         }
     
         // Tell WebGL which indices to use to index the vertices
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, track.indices);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, grass.indices);
     
         // Tell WebGL to use our program when drawing
     
@@ -386,13 +386,13 @@ function Track(gl) {
         gl.activeTexture(gl.TEXTURE0);
 
         // Bind the texture to texture unit 0
-        gl.bindTexture(gl.TEXTURE_2D, trackTexture);
+        gl.bindTexture(gl.TEXTURE_2D, grassTexture);
 
         // Tell the shader we bound the texture to texture unit 0
         gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
         {
-        const vertexCount = 18;
+        const vertexCount = 6;
         const type = gl.UNSIGNED_SHORT;
         const offset = 0;
         gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);

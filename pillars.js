@@ -1,5 +1,103 @@
 function Pillar(gl, zl) {
     // Create a buffer for the camera's vertex positions.
+    const textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+  
+    const textureCoordinates = [
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Back
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Top
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Bottom
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Right
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Left
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Back
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Top
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Bottom
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Right
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Left
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Back
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Top
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Bottom
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Right
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Left
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+    ];
+  
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+                  gl.STATIC_DRAW);
 
     const positionBuffer = gl.createBuffer();
 
@@ -225,12 +323,12 @@ function Pillar(gl, zl) {
         position: positionBuffer,
         color: colorBuffer,
         indices: indexBuffer,
-        r: 3,
+        // r: 3,
         // a: theta,
         z: zl,
         // speed: speed,
         // normal: normalBuffer,
-        // textureCoord: textureCoordBuffer,
+        textureCoord: textureCoordBuffer,
     };
 }
 
@@ -353,6 +451,151 @@ function drawPillars(gl, programInfo, buffers, deltaTime) {
         programInfo.uniformLocations.modelViewMatrix,
         false,
         modelViewMatrix);
+
+    {
+        const vertexCount = 108;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    }
+
+    // Update the rotation for the next draw
+    return buffers;
+}
+
+function drawPillarsTexture(gl, programInfo, buffers, deltaTime, wallTexture) {
+    // while(buffers.a<0)
+    // {
+    //     buffers.a += Math.PI;
+    // }
+    // while(buffers.a>=Math.PI){
+    //     buffers.a -= Math.PI;
+    // }
+    // Create a perspective matrix, a special matrix that is
+    // used to simulate the distortion of perspective in a camera.
+    // Our field of view is 45 degrees, with a width/height
+    // ratio that matches the display size of the canvas
+    // and we only want to see objects between 0.1 units
+    // and 100 units away from the camera.
+
+    const fieldOfView = 45 * Math.PI / 180;   // in radians
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const zNear = 0.1;
+    const zFar = 60.0;
+    const projectionMatrix = mat4.create();
+
+    // note: glmatrix.js always has the first argument
+    // as the destination to receive the result.
+    mat4.perspective(projectionMatrix,
+        fieldOfView,
+        aspect,
+        zNear,
+        zFar);
+
+    // Set the drawing position to the "identity" point, which is
+    // the center of the scene.
+    const modelViewMatrix = mat4.create();
+
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+//when player in air cameraR stays same 
+    mat4.translate(modelViewMatrix,     // destination matrix
+        modelViewMatrix,     // matrix to translate
+        [0, cameraR, 0]);  // amount to translate
+    
+    // mat4.translate(modelViewMatrix,     // destination matrix
+    //         modelViewMatrix,     // matrix to translate
+    //         [buffers.lane, 0, 0]);
+
+    // mat4.rotate(modelViewMatrix,  // destination matrix
+    //     modelViewMatrix,  // matrix to rotate
+    //     -cameraA-Math.PI/2,     // amount to rotate in radians
+    //     [0, 0, 1]);       // axis to rotate around (Z)
+    //
+    // mat4.translate(modelViewMatrix,     // destination matrix
+    //     modelViewMatrix,     // matrix to translate
+    //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
+
+    mat4.translate(modelViewMatrix,     // destination matrix
+        modelViewMatrix,     // matrix to translate
+        [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
+    // if(lane ==1){
+    //     mat4.translate(modelViewMatrix,     // destination matrix
+    //         modelViewMatrix,     // matrix to translate
+    //         [-1.2, 0, 0]);
+    // }
+    // else if(lane ==3){
+    //     mat4.translate(modelViewMatrix,     // destination matrix
+    //         modelViewMatrix,     // matrix to translate
+    //         [1.2, 0, 0]);
+    // }
+    // mat4.rotate(modelViewMatrix,  // destination matrix
+    //     modelViewMatrix,  // matrix to rotate
+    //     buffers.a+tunnelRotation-cameraA,     // amount to rotate in radians
+    //     [0, 0, 1]);       // axis to rotate around (Z)
+    // mat4.rotate(modelViewMatrix,  // destination matrix
+    //     modelViewMatrix,  // matrix to rotate
+    //     tunnelRotation,// amount to rotate in radians
+    //     [0, 1, 0]);       // axis to rotate around (X)
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute
+    {
+        const numComponents = 3;
+        const type = gl.FLOAT;
+        const normalize = false;
+        const stride = 0;
+        const offset = 0;
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+        gl.vertexAttribPointer(
+            programInfo.attribLocations.vertexPosition,
+            numComponents,
+            type,
+            normalize,
+            stride,
+            offset);
+        gl.enableVertexAttribArray(
+            programInfo.attribLocations.vertexPosition);
+    }
+
+        // tell webgl how to pull out the texture coordinates from buffer
+        {
+            const num = 2; // every coordinate composed of 2 values
+            const type = gl.FLOAT; // the data in the buffer is 32 bit float
+            const normalize = false; // don't normalize
+            const stride = 0; // how many bytes to get from one set to the next
+            const offset = 0; // how many bytes inside the buffer to start from
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
+            gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
+            gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+        }
+
+    // Tell WebGL which indices to use to index the vertices
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+
+    // Tell WebGL to use our program when drawing
+
+    gl.useProgram(programInfo.program);
+
+    // Set the shader uniforms
+
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix);
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix);
+        
+        // Tell WebGL we want to affect texture unit 0
+        gl.activeTexture(gl.TEXTURE0);
+
+        // Bind the texture to texture unit 0
+        gl.bindTexture(gl.TEXTURE_2D, wallTexture);
+
+        // Tell the shader we bound the texture to texture unit 0
+        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
     {
         const vertexCount = 108;

@@ -1,4 +1,4 @@
-// var lane =0;
+var sound1 =0;
 // wallTexture;
 main();
 
@@ -7,7 +7,8 @@ main();
 //
 function main() {
   sub = document.getElementById("music");
-  sub.play();
+  // if(sound1==0)
+  // sub.play(); 
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
@@ -84,11 +85,106 @@ function main() {
   }
   `;
 
+  const fsSourcebw = `
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+  varying lowp vec4 vColor;
+
+  void main(void) {
+      float gray = (vColor.r + vColor.g + vColor.b) / 3.0;
+      vec3 grayscale = vec3(gray);
+
+      gl_FragColor = vec4(grayscale, vColor.a);
+  }
+`;
+
+  const fsSourceTexbw = `
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+
+  varying highp vec2 vTextureCoord;
+  // varying highp vec3 vLighting;
+
+  uniform sampler2D uSampler;
+
+  void main(void) {
+    highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+    
+      vec3 color = texelColor.rgb;
+      float gray = (color.r + color.g + color.b) / 3.0;
+      vec3 grayscale = vec3(gray);
+
+      // gl_FragColor = vec4(grayscale * vLighting, texelColor.a);
+      gl_FragColor = vec4(grayscale, texelColor.a);
+    }
+  `;
+
+  const fsSourceBlink = `
+  varying lowp vec4 vColor;
+
+  void main(void) {
+    gl_FragColor = vColor;
+  }
+`;
+
+  const fsSourceTexBlink = `
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+
+  varying highp vec2 vTextureCoord;
+  // varying highp vec3 vLighting;
+
+  uniform sampler2D uSampler;
+
+  void main(void) {
+    highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+    gl_FragColor = vec4(texelColor.rgb , texelColor.a);
+    // gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+
+    gl_FragColor.r+=0.4;
+    gl_FragColor.g+=0.4;
+    gl_FragColor.b+=0.4;
+  }
+  `;
+  const fsSourceTexBlinkbw = `
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+  
+  varying highp vec2 vTextureCoord;
+  // varying highp vec3 vLighting;
+
+  uniform sampler2D uSampler;
+
+  void main(void) {
+    highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+     // gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+    
+    vec3 color = texelColor.rgb;
+      float gray = (color.r + color.g + color.b) / 3.0;
+      vec3 grayscale = vec3(gray);
+
+      gl_FragColor = vec4(grayscale, texelColor.a);
+      // gl_FragColor = vec4(grayscale * vLighting, texelColor.a);
+      gl_FragColor.r+=0.4;
+    gl_FragColor.g+=0.4;
+    gl_FragColor.b+=0.4;
+    
+  }
+`;
+
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
   const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
-  const shaderProgramTex = initShaderProgram(gl, vsSourceTexture, fsSourceTexture);
-
+  const shaderProgramTex = initShaderProgram(gl, vsSourceTexture, fsSourceTexture);    
+  const shaderProgrambw = initShaderProgram(gl, vsSource, fsSourcebw);
+  const shaderProgramTexbw = initShaderProgram(gl, vsSourceTexture, fsSourceTexbw);
+  const shaderProgramBlink = initShaderProgram(gl, vsSource, fsSourceBlink);
+  const shaderProgramTexBlink = initShaderProgram(gl, vsSourceTexture, fsSourceTexBlink);
+  const shaderProgramTexBlinkbw = initShaderProgram(gl, vsSourceTexture, fsSourceTexBlinkbw);
 
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
@@ -119,10 +215,81 @@ function main() {
     },
   };
 
+  const programInfobw = {
+    program: shaderProgrambw,
+    attribLocations: {
+        vertexPosition: gl.getAttribLocation(shaderProgrambw, 'aVertexPosition'),
+        vertexColor: gl.getAttribLocation(shaderProgrambw, 'aVertexColor'),
+    },
+    uniformLocations: {
+        projectionMatrix: gl.getUniformLocation(shaderProgrambw, 'uProjectionMatrix'),
+        modelViewMatrix: gl.getUniformLocation(shaderProgrambw, 'uModelViewMatrix'),
+    },
+};
+
+const programInfoTexbw = {
+  program: shaderProgramTexbw,
+  attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgramTexbw, 'aVertexPosition'),
+      textureCoord: gl.getAttribLocation(shaderProgramTexbw, 'aTextureCoord'),
+      // vertexNormal: gl.getAttribLocation(shaderProgramTexbw, 'aVertexNormal'),
+  },
+  uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgramTexbw, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramTexbw, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgramTexbw, 'uSampler'),
+      // normalMatrix: gl.getUniformLocation(shaderProgramTexbw, 'uNormalMatrix'),
+  },
+};
+
+const programInfoBlink = {
+  program: shaderProgramBlink,
+  attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgramBlink, 'aVertexPosition'),
+      vertexColor: gl.getAttribLocation(shaderProgramBlink, 'aVertexColor'),
+  },
+  uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgramBlink, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramBlink, 'uModelViewMatrix'),
+  },
+};
+
+const programInfoTexBlink = {
+  program: shaderProgramTexBlink,
+  attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgramTexBlink, 'aVertexPosition'),
+      textureCoord: gl.getAttribLocation(shaderProgramTexBlink, 'aTextureCoord'),
+      // vertexNormal: gl.getAttribLocation(shaderProgramTexBlink, 'aVertexNormal'),
+  },
+  uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgramTexBlink, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramTexBlink, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgramTexBlink, 'uSampler'),
+      // normalMatrix: gl.getUniformLocation(shaderProgramTexBlink, 'uNormalMatrix'),
+  },
+};
+
+const programInfoTexBlinkbw = {
+  program: shaderProgramTexBlinkbw,
+  attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgramTexBlinkbw, 'aVertexPosition'),
+      textureCoord: gl.getAttribLocation(shaderProgramTexBlinkbw, 'aTextureCoord'),
+      // vertexNormal: gl.getAttribLocation(shaderProgramTexBlinkbw, 'aVertexNormal'),
+  },
+  uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uSampler'),
+      // normalMatrix: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uNormalMatrix'),
+  },
+};
+
   // Here's where we call the routine that builds all the
   // objects we'll be drawing.
   var tex = false;
+  var bw = false;
   const track = Track(gl);
+  const grass = Grass(gl);
   const walls = Wall(gl);
   const player = Player(gl, -5.0);
   const camera = Camera(gl);
@@ -132,9 +299,18 @@ function main() {
   var coinssl = [];
   var coinssr = [];
   var stopblock = [];
+  var jumpboost=[];
+  var flyboost=[];
   var stoppass = [];
   var trafficlights = [];
-  const wallTexture = loadTexture(gl, './images/track1.png');
+  const wallTexture = loadTexture(gl, './images/finalWall.jpg');
+  const trackTexture = loadTexture(gl, './images/track2.jpg');
+  const grassTexture = loadTexture(gl, './images/finalgrass.jpg');
+  const blockTexture = loadTexture(gl, './images/block3copy.jpg');
+  const passTexture = loadTexture(gl, './images/block2.jpg');
+  const poleTexture = loadTexture(gl, './images/pole2.jpg');
+  const jumpTexture = loadTexture(gl, './images/crystal.jpg');
+  const flyTexture = loadTexture(gl, './images/crystal3.jpg');
 
   for (var i = 40; i <= 1040; i += 20) {
     var rand = (Math.random() * (10) - 5);
@@ -150,10 +326,21 @@ function main() {
   for (var i = 40; i <= 1100; i += 150) {
     var rand = (Math.random() * (10) - 5);
     if (rand < 0) {
+      // console.log("pillar");
       pillars.push(Pillar(gl, -i));
     }
     else{
       trafficlights.push(Trafficlight(gl, -i));
+    }
+  }
+
+  for (var i = 60; i <= 430; i += 300) {
+    if (i==60 || i==660) {
+      // console.log("pillar");
+      jumpboost.push(Jumpboost(gl, -i));
+    }
+    else{
+      flyboost.push(Flyboost(gl, -i));
     }
   }
 
@@ -168,6 +355,7 @@ function main() {
     }
     else if(rand >6 && i%50==0){
       trains.push(Train(gl,-i));
+      trains.push(Train(gl,-i-1000));
     }
   }
 
@@ -182,7 +370,7 @@ function main() {
       playerX += 1.2;
   });
 
-  Mousetrap.bind('space', function () {
+  Mousetrap.bind('up', function () {
     if(playerY==0.0)
     playerY += 1.0;
   });
@@ -194,8 +382,14 @@ function main() {
 
   Mousetrap.bind('t', function () {
     tex = ~tex;
-    console.log(tex);
+    // console.log(tex);
   });
+
+  Mousetrap.bind('b', function () {
+    bw = ~bw;
+  });
+
+  var count = 120;
 
   // Draw the scene repeatedly
   function render(now) {
@@ -210,47 +404,193 @@ function main() {
     // Clear the canvas before we start drawing on it.
   
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    //wall
-    drawTrack(gl, programInfo, track, deltaTime);
-    if (tex)
-        drawWallTexture(gl, programInfoTexture, walls, deltaTime, wallTexture);
-    else
-        drawWall(gl, programInfo, walls, deltaTime);
+    //grass
+    if(bw){
+      if (tex)
+        drawGrassTexture(gl, programInfoTexbw, grass, deltaTime, grassTexture);
+      else
+        drawGrass(gl, programInfobw, grass, deltaTime);
+    }
+    else{
+      if(tex)
+        drawGrassTexture(gl, programInfoTexture, grass, deltaTime, grassTexture);
+      else
+        drawGrass(gl, programInfo, grass, deltaTime);
+    }
 
-    drawPlayer(gl, programInfo, player, deltaTime);
+    //track
+    if(bw){
+      if (tex)
+          drawTrackTexture(gl, programInfoTexbw, track, deltaTime, trackTexture);
+      else
+          drawTrack(gl, programInfobw, track, deltaTime);
+    }
+    else{
+      if (tex)
+        drawTrackTexture(gl, programInfoTexture, track, deltaTime, trackTexture);
+      else
+        drawTrack(gl, programInfo, track, deltaTime);
+    }
+
+    //wall
+    if(bw){
+      if(count>0){
+        if (tex)
+            drawWallTexture(gl, programInfoTexbw, walls, deltaTime, wallTexture);
+        else
+            drawWall(gl, programInfobw, walls, deltaTime);
+      }
+      else{
+        if (tex)
+            drawWallTexture(gl, programInfoTexBlinkbw, walls, deltaTime, wallTexture);
+        else
+            drawWall(gl, programInfobw, walls, deltaTime);
+        if (count < -1)
+          count = 120;
+      }
+    }
+    else{
+      if(count>0){
+        if (tex)
+          drawWallTexture(gl, programInfoTexture, walls, deltaTime, wallTexture);
+        else
+          drawWall(gl, programInfo, walls, deltaTime);
+      }
+      else{
+        if (tex)
+          drawWallTexture(gl, programInfoTexBlink, walls, deltaTime, wallTexture);
+        else
+          drawWall(gl, programInfoBlink, walls, deltaTime);
+        if (count < -1)
+          count = 120;
+      }
+    }
+    count--;
+
+    //player
+    if(bw){
+      drawPlayer(gl, programInfobw, player, deltaTime);
+    }
+    else{
+      drawPlayer(gl, programInfo, player, deltaTime);
+    }
+
     drawCamera(gl, programInfo, camera, deltaTime);
+
+    //coins
     for (j = 0; j < coinss.length; ++j) {
-      drawCoins(gl, programInfo, coinss[j], deltaTime);
+      if(bw){
+        drawCoins(gl, programInfobw, coinss[j], deltaTime);
+      }
+      else{
+        drawCoins(gl, programInfo, coinss[j], deltaTime);
+      }
     }
 
     for (j = 0; j < coinssl.length; ++j) {
+      if(bw)
+      drawCoinsl(gl, programInfobw, coinssl[j], deltaTime);
+      else
       drawCoinsl(gl, programInfo, coinssl[j], deltaTime);
     }
 
     for (j = 0; j < coinssr.length; ++j) {
+      if(bw)
+      drawCoinsr(gl, programInfobw, coinssr[j], deltaTime);
+      else
       drawCoinsr(gl, programInfo, coinssr[j], deltaTime);
     }
-
+//pillar
     for (j = 0; j < pillars.length; ++j) {
-      drawPillars(gl, programInfo, pillars[j], deltaTime);
+      if(bw){
+        if (tex)
+          drawPillarsTexture(gl, programInfoTexbw, pillars[j], deltaTime, wallTexture);
+        else
+          drawPillars(gl, programInfobw, pillars[j], deltaTime);
+      }
+      else{
+        if (tex)
+          drawPillarsTexture(gl, programInfoTexture, pillars[j], deltaTime, wallTexture);
+        else
+          drawPillars(gl, programInfo, pillars[j], deltaTime);
+      }
     }
-
+    //block
     for (j = 0; j < stopblock.length; ++j) {
-      drawStopblock(gl, programInfo, stopblock[j], deltaTime);
+      if(bw){
+        if (tex)
+          drawStopblockTexture(gl, programInfoTexbw, stopblock[j], deltaTime, blockTexture);
+        else
+          drawStopblock(gl, programInfobw, stopblock[j], deltaTime);
+      }
+      else{
+        if (tex)
+        drawStopblockTexture(gl, programInfoTexture, stopblock[j], deltaTime, blockTexture);
+        else
+        drawStopblock(gl, programInfo, stopblock[j], deltaTime);
+      }
     }
-
+//passs
     for (j = 0; j < stoppass.length; ++j) {
-      drawStoppass(gl, programInfo, stoppass[j], deltaTime);
+      if(bw){
+      if (tex)
+      drawStoppassTexture(gl, programInfoTexbw, stoppass[j], deltaTime, passTexture);
+    else
+      drawStoppass(gl, programInfobw, stoppass[j], deltaTime);
+      }
+      else{
+        if (tex)
+        drawStoppassTexture(gl, programInfoTexture, stoppass[j], deltaTime, passTexture);
+      else
+        drawStoppass(gl, programInfo, stoppass[j], deltaTime);
+      }
     }
-
+//train
     for (j = 0; j < trains.length; ++j) {
+      if(bw)
+      drawTrains(gl, programInfobw, trains[j], deltaTime);
+      else
       drawTrains(gl, programInfo, trains[j], deltaTime);
-    }
 
+    }
+//trafficpole
     for (j = 0; j < trafficlights.length; ++j) {
-      drawTrafficlights(gl, programInfo, trafficlights[j], deltaTime);
+      if (tex)
+        drawTrafficlightsTexture(gl, programInfoTexture, trafficlights[j], deltaTime, poleTexture);
+      else
+        drawTrafficlights(gl, programInfo, trafficlights[j], deltaTime);
     }
 
+//jumpboost
+for (j = 0; j < jumpboost.length; ++j) {
+  if(bw){
+  if (tex)
+  drawJumpboostTexture(gl, programInfoTexbw, jumpboost[j], deltaTime, jumpTexture);
+else
+  drawJumpboost(gl, programInfobw, jumpboost[j], deltaTime);
+  }
+  else{
+    if (tex)
+    drawJumpboostTexture(gl, programInfoTexture, jumpboost[j], deltaTime, jumpTexture);
+  else
+    drawJumpboost(gl, programInfo, jumpboost[j], deltaTime);
+  }
+}
+//fly
+for (j = 0; j < flyboost.length; ++j) {
+  if(bw){
+  if (tex)
+  drawFlyboostTexture(gl, programInfoTexbw, flyboost[j], deltaTime, flyTexture);
+else
+  drawFlyboost(gl, programInfobw, flyboost[j], deltaTime);
+  }
+  else{
+    if (tex)
+    drawFlyboostTexture(gl, programInfoTexture, flyboost[j], deltaTime, flyTexture);
+  else
+    drawFlyboost(gl, programInfo, flyboost[j], deltaTime);
+  }
+}
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
