@@ -37,7 +37,53 @@ function Jumpboost(gl, zl) {
   
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
                   gl.STATIC_DRAW);
+                  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+                  gl.STATIC_DRAW);
 
+                  const normalBuffer = gl.createBuffer();
+                  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+                
+                  const vertexNormals = [
+                    // Front
+                     0.0,  0.0,  1.0,
+                     0.0,  0.0,  1.0,
+                     0.0,  0.0,  1.0,
+                     0.0,  0.0,  1.0,
+                
+                    // Back
+                     0.0,  0.0, -1.0,
+                     0.0,  0.0, -1.0,
+                     0.0,  0.0, -1.0,
+                     0.0,  0.0, -1.0,
+                
+                    // Top
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                
+                    // Bottom
+                     0.0, -1.0,  0.0,
+                     0.0, -1.0,  0.0,
+                     0.0, -1.0,  0.0,
+                     0.0, -1.0,  0.0,
+                
+                    // Right
+                     1.0,  0.0,  0.0,
+                     1.0,  0.0,  0.0,
+                     1.0,  0.0,  0.0,
+                     1.0,  0.0,  0.0,
+                
+                    // Left
+                    -1.0,  0.0,  0.0,
+                    -1.0,  0.0,  0.0,
+                    -1.0,  0.0,  0.0,
+                    -1.0,  0.0,  0.0
+                  ];
+                
+                  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals),
+                                gl.STATIC_DRAW);
+                
     // Create a buffer for the camera's vertex positions.
 
     const positionBuffer = gl.createBuffer();
@@ -163,7 +209,7 @@ function Jumpboost(gl, zl) {
         lane: lane,
         z: zl,
         // speed: speed,
-        // normal: normalBuffer,
+        normal: normalBuffer,
         textureCoord: textureCoordBuffer,
     };
 }
@@ -416,7 +462,29 @@ function drawJumpboostTexture(gl, programInfo, buffers, deltaTime, jumpTexture) 
             gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
             gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
         }
+// Tell WebGL how to pull out the normals from
+  // the normal buffer into the vertexNormal attribute.
+  {
+    const numComponents = 3;
+    const type = gl.FLOAT;
+    const normalize = false;
+    const stride = 0;
+    const offset = 0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
+    gl.vertexAttribPointer(
+        programInfo.attribLocations.vertexNormal,
+        numComponents,
+        type,
+        normalize,
+        stride,
+        offset);
+    gl.enableVertexAttribArray(
+        programInfo.attribLocations.vertexNormal);
+  }
 
+  const normalMatrix = mat4.create();
+  mat4.invert(normalMatrix, modelViewMatrix);
+  mat4.transpose(normalMatrix, normalMatrix);
     // Tell WebGL which indices to use to index the vertices
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 
@@ -434,6 +502,10 @@ function drawJumpboostTexture(gl, programInfo, buffers, deltaTime, jumpTexture) 
         programInfo.uniformLocations.modelViewMatrix,
         false,
         modelViewMatrix);
+        gl.uniformMatrix4fv(
+            programInfo.uniformLocations.normalMatrix,
+            false,
+            normalMatrix);
         
         // Tell WebGL we want to affect texture unit 0
         gl.activeTexture(gl.TEXTURE0);

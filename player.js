@@ -5,6 +5,44 @@ duckTimer =0.0;
 gravity = 0.02;
 
 function Player(gl, zl) {
+    const textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+  
+    const textureCoordinates = [
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Back
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Top
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Bottom
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Right
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Left
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+    ];
+  
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+                  gl.STATIC_DRAW);
 
     // Create a buffer for the camera's vertex positions.
 
@@ -19,40 +57,40 @@ function Player(gl, zl) {
 
     const positions = [
         // Front face
-        -0.06, -0.2,  0.06,
-        0.06, -0.2,  0.06,
-        0.06,  0.2,  0.06,
-        -0.06,  0.2,  0.06,
+        -0.15, -0.2,  0.15,
+        0.15, -0.2,  0.15,
+        0.15,  0.2,  0.15,
+        -0.15,  0.2,  0.15,
 
         // Back face
-        -0.06, -0.2, -0.06,
-        -0.06,  0.2, -0.06,
-        0.06,  0.2, -0.06,
-        0.06, -0.2, -0.06,
+        -0.15, -0.2, -0.15,
+        -0.15,  0.2, -0.15,
+        0.15,  0.2, -0.15,
+        0.15, -0.2, -0.15,
 
         // Top face
-        -0.06,  0.2, -0.06,
-        -0.06,  0.2,  0.06,
-        0.06,  0.2,  0.06,
-        0.06,  0.2, -0.06,
+        -0.15,  0.2, -0.15,
+        -0.15,  0.2,  0.15,
+        0.15,  0.2,  0.15,
+        0.15,  0.2, -0.15,
 
         // Bottom face
-        -0.06, -0.2, -0.06,
-        0.06, -0.2, -0.06,
-        0.06, -0.2,  0.06,
-        -0.06, -0.2,  0.06,
+        -0.15, -0.2, -0.15,
+        0.15, -0.2, -0.15,
+        0.15, -0.2,  0.15,
+        -0.15, -0.2,  0.15,
 
         // Right face
-        0.06, -0.2, -0.06,
-        0.06,  0.2, -0.06,
-        0.06,  0.2,  0.06,
-        0.06, -0.2,  0.06,
+        0.15, -0.2, -0.15,
+        0.15,  0.2, -0.15,
+        0.15,  0.2,  0.15,
+        0.15, -0.2,  0.15,
 
         // Left face
-        -0.06, -0.2, -0.06,
-        -0.06, -0.2,  0.06,
-        -0.06,  0.2,  0.06,
-        -0.06,  0.2, -0.06,
+        -0.15, -0.2, -0.15,
+        -0.15, -0.2,  0.15,
+        -0.15,  0.2,  0.15,
+        -0.15,  0.2, -0.15,
     ];
 
     // Now pass the list of positions into WebGL to build the
@@ -126,7 +164,7 @@ function Player(gl, zl) {
         z: zl,
         // speed: speed,
         // normal: normalBuffer,
-        // textureCoord: textureCoordBuffer,
+        textureCoord: textureCoordBuffer,
     };
 }
 
@@ -266,6 +304,153 @@ function drawPlayer(gl, programInfo, buffers, deltaTime) {
         programInfo.uniformLocations.modelViewMatrix,
         false,
         modelViewMatrix);
+
+    {
+        const vertexCount = 36;
+        const type = gl.UNSIGNED_SHORT;
+        const offset = 0;
+        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    }
+
+    // Update the rotation for the next draw
+    return buffers;
+}
+
+function drawPlayerTexture(gl, programInfo, buffers, deltaTime, playTexture) {
+
+    if (playerY > 0.0){
+        playerY -= gravity;
+    }
+
+    if(playerY <= 0){
+        playerY =0.0;
+    }
+    if(playerR !=0){
+        duckTimer+=0.1;
+    }
+
+    if(duckTimer>=2.0){
+        playerR=0.0;
+        duckTimer=0.0;
+    }
+
+    // while(buffers.a<0)
+    // {
+    //     buffers.a += Math.PI;
+    // }
+    // while(buffers.a>=Math.PI){
+    //     buffers.a -= Math.PI;
+    // }
+    // Create a perspective matrix, a special matrix that is
+    // used to simulate the distortion of perspective in a camera.
+    // Our field of view is 45 degrees, with a width/height
+    // ratio that matches the display size of the canvas
+    // and we only want to see objects between 0.1 units
+    // and 100 units away from the camera.
+
+    const fieldOfView = 45 * Math.PI / 180;   // in radians
+    const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    const zNear = 0.1;
+    const zFar = 80.0;
+    const projectionMatrix = mat4.create();
+
+    // note: glmatrix.js always has the first argument
+    // as the destination to receive the result.
+    mat4.perspective(projectionMatrix,
+        fieldOfView,
+        aspect,
+        zNear,
+        zFar);
+
+    // Set the drawing position to the "identity" point, which is
+    // the center of the scene.
+    const modelViewMatrix = mat4.create();
+
+    // Now move the drawing position a bit to where we want to
+    // start drawing the square.
+//when player in air cameraR stays same 
+    mat4.translate(modelViewMatrix,     // destination matrix
+        modelViewMatrix,     // matrix to translate
+        [0, cameraR-2.4, 0]);  // amount to translate
+
+    // mat4.rotate(modelViewMatrix,  // destination matrix
+    //     modelViewMatrix,  // matrix to rotate
+    //     -cameraA-Math.PI/2,     // amount to rotate in radians
+    //     [0, 0, 1]);       // axis to rotate around (Z)
+    //
+    // mat4.translate(modelViewMatrix,     // destination matrix
+    //     modelViewMatrix,     // matrix to translate
+    //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
+
+    mat4.translate(modelViewMatrix,     // destination matrix
+        modelViewMatrix,     // matrix to translate
+        [playerX, playerY, buffers.z]);  // amount to translate
+
+    mat4.rotate(modelViewMatrix,  // destination matrix
+        modelViewMatrix,  // matrix to rotate
+        playerR,     // amount to rotate in radians
+        [1, 0, 0]);       // axis to rotate around (Z)
+    // mat4.rotate(modelViewMatrix,  // destination matrix
+    //     modelViewMatrix,  // matrix to rotate
+    //     tunnelRotation,// amount to rotate in radians
+    //     [0, 1, 0]);       // axis to rotate around (X)
+
+    // Tell WebGL how to pull out the positions from the position
+    // buffer into the vertexPosition attribute
+    {
+        const numComponents = 3;
+        const type = gl.FLOAT;
+        const normalize = false;
+        const stride = 0;
+        const offset = 0;
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+        gl.vertexAttribPointer(
+            programInfo.attribLocations.vertexPosition,
+            numComponents,
+            type,
+            normalize,
+            stride,
+            offset);
+        gl.enableVertexAttribArray(
+            programInfo.attribLocations.vertexPosition);
+    }
+
+    {
+        const num = 2; // every coordinate composed of 2 values
+        const type = gl.FLOAT; // the data in the buffer is 32 bit float
+        const normalize = false; // don't normalize
+        const stride = 0; // how many bytes to get from one set to the next
+        const offset = 0; // how many bytes inside the buffer to start from
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
+        gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
+        gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+    }
+
+    // Tell WebGL which indices to use to index the vertices
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
+
+    // Tell WebGL to use our program when drawing
+
+    gl.useProgram(programInfo.program);
+
+    // Set the shader uniforms
+
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.projectionMatrix,
+        false,
+        projectionMatrix);
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.modelViewMatrix,
+        false,
+        modelViewMatrix);
+                // Tell WebGL we want to affect texture unit 0
+                gl.activeTexture(gl.TEXTURE0);
+
+                // Bind the texture to texture unit 0
+                gl.bindTexture(gl.TEXTURE_2D, playTexture);
+        
+                // Tell the shader we bound the texture to texture unit 0
+                gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
     {
         const vertexCount = 36;

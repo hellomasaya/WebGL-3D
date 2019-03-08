@@ -46,7 +46,33 @@ function Track(gl) {
   
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
                   gl.STATIC_DRAW);
+                  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+                  gl.STATIC_DRAW);
 
+                  const normalBuffer = gl.createBuffer();
+                  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+                
+                  const vertexNormals = [
+                
+                    // Top
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,   
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                     0.0,  1.0,  0.0,
+                
+                  ];
+                
+                  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals),
+                                gl.STATIC_DRAW);
+                
     
     // Create a buffer for the camera's vertex positions.
   
@@ -162,6 +188,7 @@ function Track(gl) {
       color: colorBuffer,
       indices: indexBuffer,
       textureCoord: textureCoordBuffer,
+      normal:normalBuffer,
     };
   }
 
@@ -363,7 +390,30 @@ function Track(gl) {
             gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
             gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
         }
-    
+        // Tell WebGL how to pull out the normals from
+        // the normal buffer into the vertexNormal attribute.
+        {
+            const numComponents = 3;
+            const type = gl.FLOAT;
+            const normalize = false;
+            const stride = 0;
+            const offset = 0;
+            gl.bindBuffer(gl.ARRAY_BUFFER, track.normal);
+            gl.vertexAttribPointer(
+                programInfo.attribLocations.vertexNormal,
+                numComponents,
+                type,
+                normalize,
+                stride,
+                offset);
+            gl.enableVertexAttribArray(
+                programInfo.attribLocations.vertexNormal);
+        }
+
+        const normalMatrix = mat4.create();
+        mat4.invert(normalMatrix, modelViewMatrix);
+        mat4.transpose(normalMatrix, normalMatrix);
+
         // Tell WebGL which indices to use to index the vertices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, track.indices);
     
@@ -381,6 +431,11 @@ function Track(gl) {
             programInfo.uniformLocations.modelViewMatrix,
             false,
             modelViewMatrix);
+
+            gl.uniformMatrix4fv(
+                programInfo.uniformLocations.normalMatrix,
+                false,
+                normalMatrix);
     
         // Tell WebGL we want to affect texture unit 0
         gl.activeTexture(gl.TEXTURE0);

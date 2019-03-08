@@ -48,15 +48,15 @@ function main() {
 
   const vsSourceTexture = `
   attribute vec4 aVertexPosition;
-  // attribute vec3 aVertexNormal;
+  attribute vec3 aVertexNormal;
   attribute vec2 aTextureCoord;
 
-  // uniform mat4 uNormalMatrix;
+  uniform mat4 uNormalMatrix;
   uniform mat4 uModelViewMatrix;
   uniform mat4 uProjectionMatrix;
 
   varying highp vec2 vTextureCoord;
-  // varying highp vec3 vLighting;
+  varying highp vec3 vLighting;
 
   void main(void) {
     gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
@@ -64,24 +64,31 @@ function main() {
 
     // Apply lighting effect
 
-    // highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
-    // highp vec3 directionalLightColor = vec3(1, 1, 1);
-    // highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
+    highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+    highp vec3 directionalLightColor = vec3(1, 1, 1);
+    highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
 
-    // highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+    highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
 
-    // highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
-    // vLighting = ambientLight + (directionalLightColor * directional);
+    highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+    vLighting = ambientLight + (directionalLightColor * directional);
   }
 `;
 
   const fsSourceTexture = `
+  #ifdef GL_ES
+  precision mediump float;
+  #endif
+  
   varying highp vec2 vTextureCoord;
+  varying highp vec3 vLighting;
 
   uniform sampler2D uSampler;
 
   void main(void) {
-    gl_FragColor = texture2D(uSampler, vTextureCoord);
+    highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+
+    gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
   }
   `;
 
@@ -105,7 +112,7 @@ function main() {
   #endif
 
   varying highp vec2 vTextureCoord;
-  // varying highp vec3 vLighting;
+  varying highp vec3 vLighting;
 
   uniform sampler2D uSampler;
 
@@ -116,8 +123,8 @@ function main() {
       float gray = (color.r + color.g + color.b) / 3.0;
       vec3 grayscale = vec3(gray);
 
-      // gl_FragColor = vec4(grayscale * vLighting, texelColor.a);
-      gl_FragColor = vec4(grayscale, texelColor.a);
+      gl_FragColor = vec4(grayscale * vLighting, texelColor.a);
+      // gl_FragColor = vec4(grayscale, texelColor.a);
     }
   `;
 
@@ -135,14 +142,14 @@ function main() {
   #endif
 
   varying highp vec2 vTextureCoord;
-  // varying highp vec3 vLighting;
+  varying highp vec3 vLighting;
 
   uniform sampler2D uSampler;
 
   void main(void) {
     highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
-    gl_FragColor = vec4(texelColor.rgb , texelColor.a);
-    // gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+    // gl_FragColor = vec4(texelColor.rgb , texelColor.a);
+    gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
 
     gl_FragColor.r+=0.4;
     gl_FragColor.g+=0.4;
@@ -155,20 +162,20 @@ function main() {
   #endif
   
   varying highp vec2 vTextureCoord;
-  // varying highp vec3 vLighting;
+  varying highp vec3 vLighting;
 
   uniform sampler2D uSampler;
 
   void main(void) {
     highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
-     // gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+     gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
     
     vec3 color = texelColor.rgb;
       float gray = (color.r + color.g + color.b) / 3.0;
       vec3 grayscale = vec3(gray);
 
-      gl_FragColor = vec4(grayscale, texelColor.a);
-      // gl_FragColor = vec4(grayscale * vLighting, texelColor.a);
+      // gl_FragColor = vec4(grayscale, texelColor.a);
+      gl_FragColor = vec4(grayscale * vLighting, texelColor.a);
       gl_FragColor.r+=0.4;
     gl_FragColor.g+=0.4;
     gl_FragColor.b+=0.4;
@@ -207,11 +214,14 @@ function main() {
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgramTex, 'aVertexPosition'),
       textureCoord: gl.getAttribLocation(shaderProgramTex, 'aTextureCoord'),
+      vertexNormal: gl.getAttribLocation(shaderProgramTex, 'aVertexNormal'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgramTex, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgramTex, 'uModelViewMatrix'),
       uSampler: gl.getUniformLocation(shaderProgramTex, 'uSampler'),
+      normalMatrix: gl.getUniformLocation(shaderProgramTex, 'uNormalMatrix'),
+
     },
   };
 
@@ -232,13 +242,13 @@ const programInfoTexbw = {
   attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgramTexbw, 'aVertexPosition'),
       textureCoord: gl.getAttribLocation(shaderProgramTexbw, 'aTextureCoord'),
-      // vertexNormal: gl.getAttribLocation(shaderProgramTexbw, 'aVertexNormal'),
+      vertexNormal: gl.getAttribLocation(shaderProgramTexbw, 'aVertexNormal'),
   },
   uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgramTexbw, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgramTexbw, 'uModelViewMatrix'),
       uSampler: gl.getUniformLocation(shaderProgramTexbw, 'uSampler'),
-      // normalMatrix: gl.getUniformLocation(shaderProgramTexbw, 'uNormalMatrix'),
+      normalMatrix: gl.getUniformLocation(shaderProgramTexbw, 'uNormalMatrix'),
   },
 };
 
@@ -259,13 +269,13 @@ const programInfoTexBlink = {
   attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgramTexBlink, 'aVertexPosition'),
       textureCoord: gl.getAttribLocation(shaderProgramTexBlink, 'aTextureCoord'),
-      // vertexNormal: gl.getAttribLocation(shaderProgramTexBlink, 'aVertexNormal'),
+      vertexNormal: gl.getAttribLocation(shaderProgramTexBlink, 'aVertexNormal'),
   },
   uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgramTexBlink, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgramTexBlink, 'uModelViewMatrix'),
       uSampler: gl.getUniformLocation(shaderProgramTexBlink, 'uSampler'),
-      // normalMatrix: gl.getUniformLocation(shaderProgramTexBlink, 'uNormalMatrix'),
+      normalMatrix: gl.getUniformLocation(shaderProgramTexBlink, 'uNormalMatrix'),
   },
 };
 
@@ -274,13 +284,13 @@ const programInfoTexBlinkbw = {
   attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgramTexBlinkbw, 'aVertexPosition'),
       textureCoord: gl.getAttribLocation(shaderProgramTexBlinkbw, 'aTextureCoord'),
-      // vertexNormal: gl.getAttribLocation(shaderProgramTexBlinkbw, 'aVertexNormal'),
+      vertexNormal: gl.getAttribLocation(shaderProgramTexBlinkbw, 'aVertexNormal'),
   },
   uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uModelViewMatrix'),
       uSampler: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uSampler'),
-      // normalMatrix: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uNormalMatrix'),
+      normalMatrix: gl.getUniformLocation(shaderProgramTexBlinkbw, 'uNormalMatrix'),
   },
 };
 
@@ -310,6 +320,7 @@ const programInfoTexBlinkbw = {
   const passTexture = loadTexture(gl, './images/block2.jpg');
   const poleTexture = loadTexture(gl, './images/pole2.jpg');
   const jumpTexture = loadTexture(gl, './images/crystal.jpg');
+  const playTexture = loadTexture(gl, './images/finalgrass.jpg');
   const flyTexture = loadTexture(gl, './images/crystal3.jpg');
 
   for (var i = 40; i <= 1040; i += 20) {
@@ -469,9 +480,15 @@ const programInfoTexBlinkbw = {
 
     //player
     if(bw){
+      // if(tex)
+      // drawPlayerTexture(gl, programInfobw, player, deltaTime, playTexture);
+      // else
       drawPlayer(gl, programInfobw, player, deltaTime);
     }
     else{
+      // if(tex)
+      // drawPlayerTexture(gl, programInfo, player, deltaTime, playTexture);
+      // else
       drawPlayer(gl, programInfo, player, deltaTime);
     }
 
