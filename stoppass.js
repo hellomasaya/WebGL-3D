@@ -97,8 +97,8 @@ const textureCoordBuffer = gl.createBuffer();
   
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
                   gl.STATIC_DRAW);
-                  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
-                  gl.STATIC_DRAW);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+    //               gl.STATIC_DRAW);
 
                   const normalBuffer = gl.createBuffer();
                   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
@@ -138,7 +138,7 @@ const textureCoordBuffer = gl.createBuffer();
                     -1.0,  0.0,  0.0,
                     -1.0,  0.0,  0.0,
                     -1.0,  0.0,  0.0,
-                    -1.0,  0.0,  0.0
+                    -1.0,  0.0,  0.0,
 
                     // Front
                     0.0,  0.0,  1.0,
@@ -174,7 +174,7 @@ const textureCoordBuffer = gl.createBuffer();
                    -1.0,  0.0,  0.0,
                    -1.0,  0.0,  0.0,
                    -1.0,  0.0,  0.0,
-                   -1.0,  0.0,  0.0
+                   -1.0,  0.0,  0.0,
 
                    // Front
                    0.0,  0.0,  1.0,

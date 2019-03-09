@@ -320,8 +320,9 @@ const programInfoTexBlinkbw = {
   const passTexture = loadTexture(gl, './images/block2.jpg');
   const poleTexture = loadTexture(gl, './images/pole2.jpg');
   const jumpTexture = loadTexture(gl, './images/crystal.jpg');
-  const playTexture = loadTexture(gl, './images/finalgrass.jpg');
+  const playTexture = loadTexture(gl, './images/player2.jpg');
   const flyTexture = loadTexture(gl, './images/crystal3.jpg');
+  const trainTexture = loadTexture(gl, './images/train3.png');
 
   for (var i = 40; i <= 1040; i += 20) {
     var rand = (Math.random() * (10) - 5);
@@ -480,16 +481,16 @@ const programInfoTexBlinkbw = {
 
     //player
     if(bw){
-      // if(tex)
-      // drawPlayerTexture(gl, programInfobw, player, deltaTime, playTexture);
-      // else
-      drawPlayer(gl, programInfobw, player, deltaTime);
+      if(tex)
+        drawPlayerTexture(gl, programInfoTexbw, player, deltaTime, playTexture);
+      else
+        drawPlayer(gl, programInfobw, player, deltaTime);
     }
     else{
-      // if(tex)
-      // drawPlayerTexture(gl, programInfo, player, deltaTime, playTexture);
-      // else
-      drawPlayer(gl, programInfo, player, deltaTime);
+      if(tex)
+        drawPlayerTexture(gl, programInfoTexture, player, deltaTime, playTexture);
+      else
+        drawPlayer(gl, programInfo, player, deltaTime);
     }
 
     drawCamera(gl, programInfo, camera, deltaTime);
@@ -564,12 +565,20 @@ const programInfoTexBlinkbw = {
     }
 //train
     for (j = 0; j < trains.length; ++j) {
-      if(bw)
-      drawTrains(gl, programInfobw, trains[j], deltaTime);
-      else
-      drawTrains(gl, programInfo, trains[j], deltaTime);
+      if(bw){
+        if(tex)
+          drawTrainsTexture(gl, programInfoTexbw, trains[j], deltaTime, trainTexture);
+        else
+          drawTrains(gl, programInfobw, trains[j], deltaTime);
+      }
+      else{
+        if(tex)        
+          drawTrainsTexture(gl, programInfoTexture, trains[j], deltaTime, trainTexture);
+          else
+          drawTrains(gl, programInfo, trains[j], deltaTime);
+      }
 
-    }
+  }
 //trafficpole
     for (j = 0; j < trafficlights.length; ++j) {
       if (tex)

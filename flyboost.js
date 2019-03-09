@@ -37,8 +37,8 @@ function Flyboost(gl, zl) {
   
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
                   gl.STATIC_DRAW);
-                  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
-                  gl.STATIC_DRAW);
+                //   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+                //   gl.STATIC_DRAW);
 
                   const normalBuffer = gl.createBuffer();
                   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
