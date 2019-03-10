@@ -27,7 +27,9 @@ var trafficlights = [];
 var left = false;
 var right = false;
 var fly = 0;
+var rot = 0; //duck
 var jump = 0;
+
 
 //reposition after collision
 var repos_coin=[]; //coinss i.e middle coins
@@ -40,13 +42,13 @@ caught=false;
 
 function callDead() {
   death = 1;
-  console.log("dead");
-  // $("#canvasDiv").html("<h1>Game Over</h1>");
+  // console.log("dead");
+  $("#canvasDiv").html("<h1>Game Over</h1>");
   document.getElementById('music').pause();
-  // document.getElementById('crash').play();
+  document.getElementById('crash').play();
 }
 
-//collisions
+//collisions - no need of separate functions
 function detectCollision_CoinPlayer(coin, player){
     // console.log("mid",coin.posx);
   if( Math.abs(player.posx - coin.posx) < player.lengthx/2+coin.lengthx/2 
@@ -88,7 +90,7 @@ function detectCollision_FlyPlayer(flyboost, player){
   if(Math.abs(player.posx - flyboost.posx) < player.lengthx/2+flyboost.lengthx/2
   && Math.abs(player.posy - flyboost.posy) < player.lengthy/2+flyboost.lengthx/2
   && Math.abs(player.posz - flyboost.posz) < player.lengthz/2+flyboost.lengthx/2){
-    console.log("flying");
+    // console.log("flying");
     return 1;
   }
 }
@@ -97,11 +99,18 @@ function detectCollision_JumpPlayer(jumpboost, player){
   if(Math.abs(player.posx - jumpboost.posx) < player.lengthx/2+jumpboost.lengthx/2
   && Math.abs(player.posy - jumpboost.posy) < player.lengthy/2+jumpboost.lengthx/2
   && Math.abs(player.posz - jumpboost.posz) < player.lengthz/2+jumpboost.lengthx/2){
-    console.log("jumping");
+    // console.log("jumping");
     return 1;
   }
 }
 
+function detect_collision(object, player){ //train, stopblock, stoppass, target, pole
+  // console.log(object.posy, player.posy);
+  if(Math.abs(player.posx - object.posx) < player.lengthx/2+object.lengthx/2
+  && Math.abs(player.posy+0.7299 - object.posy) < player.lengthy/2+object.lengthx/2
+  && Math.abs(player.posz - object.posz) < player.lengthz/2+object.lengthx/2)
+    return 1;
+}
 
 main();
 //
@@ -508,7 +517,9 @@ const programInfoTexBlinkbw = {
 
   // Draw the scene repeatedly
   function render(now) {
-    console.log(jump);
+// console.log(hit);
+
+    // console.log(jump);
     // console.log(repos_coinr);
 
     // console.log(cameraPositionz);
@@ -520,7 +531,8 @@ const programInfoTexBlinkbw = {
     gl.clearDepth(1.0);                 // Clear everything
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
-  
+    $("#score").text("Score: " + (Math.round(score)));
+    $("#jump").text("Jump: " + (Math.round(jump)));
     // Clear the canvas before we start drawing on it.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //grass
@@ -699,6 +711,10 @@ const programInfoTexBlinkbw = {
         else
         drawStopblock(gl, programInfo, stopblock[j], deltaTime);
       }
+
+      if(detect_collision(stopblock[j], player)){
+        hit+=1;
+      }
     }
 //passs
     for (j = 0; j < stoppass.length; ++j) {
@@ -714,6 +730,10 @@ const programInfoTexBlinkbw = {
       else
         drawStoppass(gl, programInfo, stoppass[j], deltaTime);
       }
+
+      // if(detect_collision(stoppass[j], player)){
+      //   hit+=1;
+      // }
     }
 //train
     for (j = 0; j < trains.length; ++j) {
@@ -728,6 +748,9 @@ const programInfoTexBlinkbw = {
           drawTrainsTexture(gl, programInfoTexture, trains[j], deltaTime, trainTexture);
           else
           drawTrains(gl, programInfo, trains[j], deltaTime);
+      }
+        if(detect_collision(trains[j], player)){
+            callDead();
       }
 
   }
@@ -773,6 +796,10 @@ else
     if(detectCollision_FlyPlayer(flyboost[j], player)){
       fly=3.2;
   }
+}
+
+if(hit>=14){
+  callDead();
 }
     requestAnimationFrame(render);
   }

@@ -1,4 +1,10 @@
 function Stoppass(gl, zl) {
+    posx=0.0;
+    posy=0.0;
+    posz=0.0;
+    lengthx = 0.8;
+    lengthy =0.8;
+    lengthz =0.18;
 const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -439,6 +445,12 @@ const textureCoordBuffer = gl.createBuffer();
         z: zl,
         normal: normalBuffer,
         textureCoord: textureCoordBuffer,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
     };
 }
 
@@ -485,7 +497,9 @@ function drawStoppass(gl, programInfo, buffers, deltaTime) {
     mat4.translate(modelViewMatrix,     // destination matrix
             modelViewMatrix,     // matrix to translate
             [buffers.lane, 0, 0]);
-
+            buffers.posx=buffers.lane;
+            buffers.posy=cameraR-2.27;
+            buffers.posz=cameraPositionz+buffers.z;
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians

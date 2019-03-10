@@ -1,4 +1,10 @@
 function Stopblock(gl, zl) {
+    posx=0.0;
+    posy=0.0;
+    posz=0.0;
+    lengthx = 0.8;
+    lengthy =0.3;
+    lengthz =0.18;
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -206,6 +212,12 @@ function Stopblock(gl, zl) {
         z: zl,
         normal: normalBuffer,
         textureCoord: textureCoordBuffer,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
     };
 }
 
@@ -252,6 +264,9 @@ function drawStopblock(gl, programInfo, buffers, deltaTime) {
         modelViewMatrix,     // matrix to translate
         [buffers.lane, 0, 0]);
     // }
+    buffers.posx=buffers.lane;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=cameraPositionz+buffers.z;
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
 //when player in air cameraR stays same 
@@ -394,7 +409,9 @@ function drawStopblockTexture(gl, programInfo, buffers, deltaTime, blockTexture)
     mat4.translate(modelViewMatrix,     // destination matrix
             modelViewMatrix,     // matrix to translate
             [buffers.lane, 0, 0]);
-
+    buffers.posx=buffers.lane;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=cameraPositionz+buffers.z;
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians
