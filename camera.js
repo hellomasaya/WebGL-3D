@@ -1,9 +1,9 @@
-cameraRotation = 0.0;
-cameraPositionz = 0.0;
-cameraR = 0.8; //in air
-cameraA = -Math.PI / 2;
-cameraV = 0;
-gravity = 0.01;
+// cameraRotation = 0.0;
+// cameraPositionz = 0.0;
+// cameraR = 0.8;
+// cameraA = -Math.PI / 2;
+// cameraV = 0;
+// gravity = 0.01;
 
 function Camera(gl) {
 
@@ -121,20 +121,20 @@ function Camera(gl) {
 }
 
 function drawCamera(gl, programInfo, buffers, deltaTime) {
-    if (cameraV !== 0){
-        cameraR -= cameraV;
-        cameraV -= gravity;
-    }
-    if (cameraR > 1.5) {
-        cameraR = 1.5;
-        cameraV = 0;
-    }
-    while (cameraA < 0) {
-        cameraA += 2 * Math.PI;
-    }
-    while (cameraA >= 2 * Math.PI) {
-        cameraA -= 2 * Math.PI;
-    }
+    // if (cameraV !== 0){
+    //     cameraR -= cameraV;
+    //     cameraV -= gravity;
+    // }
+    // if (cameraR > 1.5) {
+    //     cameraR = 1.5;
+    //     cameraV = 0;
+    // }
+    // while (cameraA < 0) {
+    //     cameraA += 2 * Math.PI;
+    // }
+    // while (cameraA >= 2 * Math.PI) {
+    //     cameraA -= 2 * Math.PI;
+    // }
     // Create a perspective matrix, a special matrix that is
     // used to simulate the distortion of perspective in a camera.
     // Our field of view is 45 degrees, with a width/height

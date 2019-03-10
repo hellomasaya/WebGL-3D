@@ -1,14 +1,115 @@
-var sound1 =0;
-// wallTexture;
-main();
+var score =0;
+var hit =0; //hits obstacles
+var death =0; //hits train or pillars
+cameraRotation = 0.0;
+cameraPositionz = 0.0;
+cameraR = 0.8;
+cameraA = -Math.PI / 2;
+cameraV = 0;
+gravity = 0.02;
+//objects
+var track;
+var grass;
+var walls;
+var player;
+var camera;
+var target;
+var pillars = [];
+var trains = [];
+var coinss = [];
+var coinssl = [];
+var coinssr = [];
+var stopblock = [];
+var jumpboost=[];
+var flyboost=[];
+var stoppass = [];
+var trafficlights = [];
+var left = false;
+var right = false;
+var fly = 0;
+var jump = 0;
 
+//reposition after collision
+var repos_coin=[]; //coinss i.e middle coins
+var repos_coinl=[]; //coins i.e left coins
+var repos_coinr=[]; //coins i.e right coins
+
+//policeman
+policeman=false;
+caught=false;
+
+function callDead() {
+  death = 1;
+  console.log("dead");
+  // $("#canvasDiv").html("<h1>Game Over</h1>");
+  document.getElementById('music').pause();
+  // document.getElementById('crash').play();
+}
+
+//collisions
+function detectCollision_CoinPlayer(coin, player){
+    // console.log("mid",coin.posx);
+  if( Math.abs(player.posx - coin.posx) < player.lengthx/2+coin.lengthx/2 
+    && Math.abs(player.posy - coin.posy) < player.lengthy/2+coin.lengthy/2
+    && Math.abs(player.posz - coin.posz) < player.lengthz/2+coin.lengthz/2 ){
+        return 1;
+    }
+}
+
+function detectCollision_CoinleftPlayer(coinl, player){
+  // console.log(coinl.lengthx);
+if( Math.abs(player.posx - coinl.posx) < player.lengthx/2+coinl.lengthx/2 
+  && Math.abs(player.posy - coinl.posy) < player.lengthy/2+coinl.lengthy/2
+  && Math.abs(player.posz - coinl.posz) < player.lengthz/2+coinl.lengthz/2 ){
+      return 1;
+  }
+}
+
+function detectCollision_CoinrightPlayer(coinr, player){
+  // console.log("player", "z", player.posz);
+  // console.log("coin", "z", coinr.posz);
+if( Math.abs(player.posx - coinr.posx) < player.lengthx/2+coinr.lengthx/2 
+  && Math.abs(player.posy - coinr.posy) < player.lengthy/2+coinr.lengthy/2
+  && Math.abs(player.posz - coinr.posz) < player.lengthz/2+coinr.lengthz/2 ){
+      return 1;
+  }
+}
+
+function detectCollision_pillarPlayer(pillar, player){ //not working
+if( ( left && ((player.posz - pillar.posz) < player.lengthz/2+pillar.lengthz/2 ))
+|| (right && ((player.posz - pillar.posz) < player.lengthz/2+pillar.lengthz/2) )){
+      return 1;
+  }
+}
+
+function detectCollision_FlyPlayer(flyboost, player){
+  // console.log(flyboost.posz);
+  // console.log(player.lengthz/2+flyboost.lengthx/2, player.posz - flyboost.posz);
+  if(Math.abs(player.posx - flyboost.posx) < player.lengthx/2+flyboost.lengthx/2
+  && Math.abs(player.posy - flyboost.posy) < player.lengthy/2+flyboost.lengthx/2
+  && Math.abs(player.posz - flyboost.posz) < player.lengthz/2+flyboost.lengthx/2){
+    console.log("flying");
+    return 1;
+  }
+}
+
+function detectCollision_JumpPlayer(jumpboost, player){
+  if(Math.abs(player.posx - jumpboost.posx) < player.lengthx/2+jumpboost.lengthx/2
+  && Math.abs(player.posy - jumpboost.posy) < player.lengthy/2+jumpboost.lengthx/2
+  && Math.abs(player.posz - jumpboost.posz) < player.lengthz/2+jumpboost.lengthx/2){
+    console.log("jumping");
+    return 1;
+  }
+}
+
+
+main();
 //
 // Start here
 //
 function main() {
   sub = document.getElementById("music");
   // if(sound1==0)
-  // sub.play(); 
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
@@ -122,9 +223,9 @@ function main() {
       vec3 color = texelColor.rgb;
       float gray = (color.r + color.g + color.b) / 3.0;
       vec3 grayscale = vec3(gray);
+      // gl_FragColor = vec4(grayscale, texelColor.a);
 
       gl_FragColor = vec4(grayscale * vLighting, texelColor.a);
-      // gl_FragColor = vec4(grayscale, texelColor.a);
     }
   `;
 
@@ -298,21 +399,13 @@ const programInfoTexBlinkbw = {
   // objects we'll be drawing.
   var tex = false;
   var bw = false;
-  const track = Track(gl);
-  const grass = Grass(gl);
-  const walls = Wall(gl);
-  const player = Player(gl, -5.0);
-  const camera = Camera(gl);
-  var pillars = [];
-  var trains = [];
-  var coinss = [];
-  var coinssl = [];
-  var coinssr = [];
-  var stopblock = [];
-  var jumpboost=[];
-  var flyboost=[];
-  var stoppass = [];
-  var trafficlights = [];
+  track = Track(gl);
+  grass = Grass(gl);
+  walls = Wall(gl);
+  player = Player(gl, -5.0);
+  camera = Camera(gl);
+  target = Target(gl, -1100.0);
+
   const wallTexture = loadTexture(gl, './images/finalWall.jpg');
   const trackTexture = loadTexture(gl, './images/track2.jpg');
   const grassTexture = loadTexture(gl, './images/finalgrass.jpg');
@@ -323,14 +416,18 @@ const programInfoTexBlinkbw = {
   const playTexture = loadTexture(gl, './images/player2.jpg');
   const flyTexture = loadTexture(gl, './images/crystal3.jpg');
   const trainTexture = loadTexture(gl, './images/train3.png');
+  const targetTexture = loadTexture(gl, './images/target.png');
 
   for (var i = 40; i <= 1040; i += 20) {
     var rand = (Math.random() * (10) - 5);
     if (rand < 0) {
         coinss.push(Coin(gl, -i));
+        repos_coin.push(0);
     }
     else {
       coinssl.push(Coinl(gl, -i));
+      repos_coinl.push(0);
+      repos_coinr.push(0);
       coinssr.push(Coinr(gl, -i));
     }
   }
@@ -338,7 +435,6 @@ const programInfoTexBlinkbw = {
   for (var i = 40; i <= 1100; i += 150) {
     var rand = (Math.random() * (10) - 5);
     if (rand < 0) {
-      // console.log("pillar");
       pillars.push(Pillar(gl, -i));
     }
     else{
@@ -348,7 +444,6 @@ const programInfoTexBlinkbw = {
 
   for (var i = 60; i <= 430; i += 300) {
     if (i==60 || i==660) {
-      // console.log("pillar");
       jumpboost.push(Jumpboost(gl, -i));
     }
     else{
@@ -357,7 +452,6 @@ const programInfoTexBlinkbw = {
   }
 
   for (var i = 60; i <= 1040; i += 10) {
-    // console.log(lane);
     var rand = (Math.random() * (10));
     if (rand > 0 && rand < 3) {
         stopblock.push(Stopblock(gl, -i));
@@ -371,20 +465,24 @@ const programInfoTexBlinkbw = {
     }
   }
 
+
   var then = 0;
   Mousetrap.bind('left', function () {
     if(playerX>=0.0)
       playerX += -1.2;
+      // left=true; //for pillar left leg collision
+
   });
 
   Mousetrap.bind('right', function () {
     if(playerX<=0.0)
       playerX += 1.2;
+      // right=true; //for piller right leg collision
   });
 
   Mousetrap.bind('up', function () {
     if(playerY==0.0)
-    playerY += 1.0;
+    playerY += 1.0+jump;
   });
 
   Mousetrap.bind('down', function () {
@@ -394,17 +492,27 @@ const programInfoTexBlinkbw = {
 
   Mousetrap.bind('t', function () {
     tex = ~tex;
-    // console.log(tex);
   });
 
   Mousetrap.bind('b', function () {
     bw = ~bw;
   });
 
+  Mousetrap.bind('p',function (){
+    sub.play();
+  });
+
+
+
   var count = 120;
 
   // Draw the scene repeatedly
   function render(now) {
+    console.log(jump);
+    // console.log(repos_coinr);
+
+    // console.log(cameraPositionz);
+
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
@@ -414,7 +522,6 @@ const programInfoTexBlinkbw = {
     gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
   
     // Clear the canvas before we start drawing on it.
-  
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     //grass
     if(bw){
@@ -429,6 +536,8 @@ const programInfoTexBlinkbw = {
       else
         drawGrass(gl, programInfo, grass, deltaTime);
     }
+
+    //debug
 
     //track
     if(bw){
@@ -480,6 +589,7 @@ const programInfoTexBlinkbw = {
     count--;
 
     //player
+
     if(bw){
       if(tex)
         drawPlayerTexture(gl, programInfoTexbw, player, deltaTime, playTexture);
@@ -493,23 +603,52 @@ const programInfoTexBlinkbw = {
         drawPlayer(gl, programInfo, player, deltaTime);
     }
 
+
+    //target
+    if(bw){
+      if(tex)
+        drawTargetsTexture(gl, programInfoTexbw, target, deltaTime, targetTexture);
+      else
+        drawTargets(gl, programInfobw, target, deltaTime);
+    }
+    else{
+      if(tex)
+        drawTargetsTexture(gl, programInfoTexture, target, deltaTime, targetTexture);
+      else
+        drawTargets(gl, programInfo, target, deltaTime);
+    }
+    //camera
     drawCamera(gl, programInfo, camera, deltaTime);
 
     //coins
     for (j = 0; j < coinss.length; ++j) {
       if(bw){
-        drawCoins(gl, programInfobw, coinss[j], deltaTime);
+        drawCoins(gl, programInfobw, coinss[j], deltaTime, repos_coin[j]);
       }
       else{
-        drawCoins(gl, programInfo, coinss[j], deltaTime);
+        drawCoins(gl, programInfo, coinss[j], deltaTime, repos_coin[j]);
       }
+
+      if(detectCollision_CoinPlayer(coinss[j], player)){
+        score+=10;
+        repos_coin[j] = 1;
+      }
+
+      // console.log(coinss[j].posz);
     }
 
     for (j = 0; j < coinssl.length; ++j) {
-      if(bw)
-      drawCoinsl(gl, programInfobw, coinssl[j], deltaTime);
-      else
-      drawCoinsl(gl, programInfo, coinssl[j], deltaTime);
+      if(bw){
+        drawCoinsl(gl, programInfobw, coinssl[j], deltaTime, repos_coinl[j]);
+      }
+      else{
+        drawCoinsl(gl, programInfo, coinssl[j], deltaTime, repos_coinl[j]);
+      }
+
+      if(detectCollision_CoinleftPlayer(coinssl[j], player)){
+        score+=10;
+        repos_coinl[j] = 1;
+      }
     }
 
     for (j = 0; j < coinssr.length; ++j) {
@@ -517,7 +656,13 @@ const programInfoTexBlinkbw = {
       drawCoinsr(gl, programInfobw, coinssr[j], deltaTime);
       else
       drawCoinsr(gl, programInfo, coinssr[j], deltaTime);
+
+      if(detectCollision_CoinrightPlayer(coinssr[0], player)){
+        score+=10;
+        repos_coinr[j] = 1;
+      }
     }
+
 //pillar
     for (j = 0; j < pillars.length; ++j) {
       if(bw){
@@ -531,6 +676,13 @@ const programInfoTexBlinkbw = {
           drawPillarsTexture(gl, programInfoTexture, pillars[j], deltaTime, wallTexture);
         else
           drawPillars(gl, programInfo, pillars[j], deltaTime);
+      }
+
+      if(detectCollision_pillarPlayer(pillars[j], player)){
+        // score+=10;
+        // repos_coinr[j] = 1;
+        callDead();
+        // console.log("dead");
       }
     }
     //block
@@ -601,6 +753,8 @@ else
   else
     drawJumpboost(gl, programInfo, jumpboost[j], deltaTime);
   }
+  if(detectCollision_JumpPlayer(jumpboost[j], player)){
+    jump=1.4;}
 }
 //fly
 for (j = 0; j < flyboost.length; ++j) {
@@ -615,6 +769,9 @@ else
     drawFlyboostTexture(gl, programInfoTexture, flyboost[j], deltaTime, flyTexture);
   else
     drawFlyboost(gl, programInfo, flyboost[j], deltaTime);
+    }
+    if(detectCollision_FlyPlayer(flyboost[j], player)){
+      fly=3.2;
   }
 }
     requestAnimationFrame(render);
@@ -622,223 +779,6 @@ else
   requestAnimationFrame(render);
 }
 
-//
-// initBuffers
-//
-// Initialize the buffers we'll need. For this demo, we just
-// have one object -- a simple three-dimensional cube.
-//
-// function initBuffers(gl) {
-
-//   // Create a buffer for the cube's vertex positions.
-
-//   const positionBuffer = gl.createBuffer();
-
-//   // Select the positionBuffer as the one to apply buffer
-//   // operations to from here out.
-
-//   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-//   // Now create an array of positions for the cube.
-
-//   const positions = [
-//     // Front face
-//     -1.0, -1.0,  1.0,
-//      1.0, -1.0,  1.0,
-//      1.0,  1.0,  1.0,
-//     -1.0,  1.0,  1.0,
-
-//   ];
-
-//   // Now pass the list of positions into WebGL to build the
-//   // shape. We do this by creating a Float32Array from the
-//   // JavaScript array, then use it to fill the current buffer.
-
-//   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-//   // Now set up the colors for the faces. We'll use solid colors
-//   // for each face.
-
-//   const faceColors = [
-//     [1.0,  1.0,  1.0,  1.0],    // Front face: white
-//     [1.0,  0.0,  0.0,  1.0],    // Back face: red
-//     [0.0,  1.0,  0.0,  1.0],    // Top face: green
-//     [0.0,  0.0,  1.0,  1.0],    // Bottom face: blue
-//     [1.0,  1.0,  0.0,  1.0],    // Right face: yellow
-//     [1.0,  0.0,  1.0,  1.0],    // Left face: purple
-//   ];
-//   // var colors = [
-//   //   1.0,  1.0,  1.0,  1.0,    // white
-//   //   1.0,  0.0,  0.0,  1.0,    // red
-//   //   0.0,  1.0,  0.0,  1.0,    // green
-//   //   0.0,  0.0,  1.0,  1.0,    // blue
-//   // ];
-//   // Convert the array of colors into a table for all the vertices.
-
-//   var colors = [];
-
-//   for (var j = 0; j < faceColors.length; ++j) {
-//     const c = faceColors[j];
-
-//     // Repeat each color four times for the four vertices of the face
-//     colors = colors.concat(c, c, c, c);
-
-//   }
-
-//   const colorBuffer = gl.createBuffer();
-//   gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-//   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-
-//   // Build the element array buffer; this specifies the indices
-//   // into the vertex arrays for each face's vertices.
-
-//   const indexBuffer = gl.createBuffer();
-//   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-//   // This array defines each face as two triangles, using the
-//   // indices into the vertex array to specify each triangle's
-//   // position.
-
-//   const indices = [
-//     0,  1,  2,      0,  2,  3,    // front
-//     4,  5,  6,      4,  6,  7,    // back
-//     8,  9,  10,     8,  10, 11,   // top
-//     12, 13, 14,     12, 14, 15,   // bottom
-//     16, 17, 18,     16, 18, 19,   // right
-//     20, 21, 22,     20, 22, 23,   // left
-//   ];
-
-//   // Now send the element array to GL
-
-//   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
-//       new Uint16Array(indices), gl.STATIC_DRAW);
-
-//   return {
-//     position: positionBuffer,
-//     color: colorBuffer,
-//     indices: indexBuffer,
-//   };
-// }
-
-//
-// Draw the scene.
-//
-// function drawScene(gl, programInfo, buffers, deltaTime) {
-//   gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
-//   gl.clearDepth(1.0);                 // Clear everything
-//   gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-//   gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
-
-//   // Clear the canvas before we start drawing on it.
-
-//   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-//   // Create a perspective matrix, a special matrix that is
-//   // used to simulate the distortion of perspective in a camera.
-//   // Our field of view is 45 degrees, with a width/height
-//   // ratio that matches the display size of the canvas
-//   // and we only want to see objects between 0.1 units
-//   // and 100 units away from the camera.
-
-//   const fieldOfView = 45 * Math.PI / 180;   // in radians
-//   const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-//   const zNear = 0.1;
-//   const zFar = 100.0;
-//   const projectionMatrix = mat4.create();
-
-//   // note: glmatrix.js always has the first argument
-//   // as the destination to receive the result.
-//   mat4.perspective(projectionMatrix,
-//                    fieldOfView,
-//                    aspect,
-//                    zNear,
-//                    zFar);
-
-//   // Set the drawing position to the "identity" point, which is
-//   // the center of the scene.
-//   const modelViewMatrix = mat4.create();
-
-//   // Now move the drawing position a bit to where we want to
-//   // start drawing the square.
-
-//   mat4.translate(modelViewMatrix,     // destination matrix
-//                  modelViewMatrix,     // matrix to translate
-//                  [-0.0, 0.0, -6.0]);  // amount to translate
-
-//   //Write your code to Rotate the cube here//
-//   mat4.rotate(modelViewMatrix, modelViewMatrix, cubeRotation * .7, [0, 1, 0]);
-
-//   // Tell WebGL how to pull out the positions from the position
-//   // buffer into the vertexPosition attribute
-//   {
-//     const numComponents = 3;
-//     const type = gl.FLOAT;
-//     const normalize = false;
-//     const stride = 0;
-//     const offset = 0;
-//     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-//     gl.vertexAttribPointer(
-//         programInfo.attribLocations.vertexPosition,
-//         numComponents,
-//         type,
-//         normalize,
-//         stride,
-//         offset);
-//     gl.enableVertexAttribArray(
-//         programInfo.attribLocations.vertexPosition);
-//   }
-
-//   // Tell WebGL how to pull out the colors from the color buffer
-//   // into the vertexColor attribute.
-//   {
-//     const numComponents = 4;
-//     const type = gl.FLOAT;
-//     const normalize = false;
-//     const stride = 0;
-//     const offset = 0;
-//     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.color);
-//     gl.vertexAttribPointer(
-//         programInfo.attribLocations.vertexColor,
-//         numComponents,
-//         type,
-//         normalize,
-//         stride,
-//         offset);
-//     gl.enableVertexAttribArray(
-//         programInfo.attribLocations.vertexColor);
-//   }
-
-//   // Tell WebGL which indices to use to index the vertices
-//   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
-
-//   // Tell WebGL to use our program when drawing
-
-//   gl.useProgram(programInfo.program);
-
-//   // Set the shader uniforms
-
-//   gl.uniformMatrix4fv(
-//       programInfo.uniformLocations.projectionMatrix,
-//       false,
-//       projectionMatrix);
-//   gl.uniformMatrix4fv(
-//       programInfo.uniformLocations.modelViewMatrix,
-//       false,
-//       modelViewMatrix);
-
-//   {
-//     const vertexCount = 36;
-//     const type = gl.UNSIGNED_SHORT;
-//     const offset = 0;
-//     gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
-//   }
-
-//   // Update the rotation for the next draw
-
-//   cubeRotation += deltaTime;
-// }
-
-//
 // Initialize a shader program, so WebGL knows how to draw our data
 //
 function initShaderProgram(gl, vsSource, fsSource) {

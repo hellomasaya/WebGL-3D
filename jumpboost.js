@@ -1,4 +1,8 @@
 function Jumpboost(gl, zl) {
+    posx=0;
+    posy=0;
+    posz=0;
+    lengthx=0.24;
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -207,6 +211,10 @@ function Jumpboost(gl, zl) {
         indices: indexBuffer,
         // r: 3,
         lane: lane,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
         z: zl,
         // speed: speed,
         normal: normalBuffer,
@@ -264,6 +272,9 @@ function drawJumpboost(gl, programInfo, buffers, deltaTime) {
         modelViewMatrix,     // matrix to translate
         [0, cameraR-2.27, 1.5]);  // amount to translate
 
+        buffers.posx= buffers.lane;
+        buffers.posy= cameraR-2.27;
+        buffers.posz= 1.5+cameraPositionz+buffers.z;
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians
@@ -400,6 +411,9 @@ function drawJumpboostTexture(gl, programInfo, buffers, deltaTime, jumpTexture) 
             modelViewMatrix,     // matrix to translate
             [buffers.lane, 0, 0]);
 
+            buffers.posx= buffers.lane;
+            buffers.posy= cameraR-2.27;
+            buffers.posz= 1.5+cameraPositionz+buffers.z;
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians

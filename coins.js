@@ -1,5 +1,12 @@
-function Coin(gl, zl) {
+//coins dimensions and position
 
+function Coin(gl, zl) {
+    posx=0;
+    posy=0.0;
+    posz=0.0;
+    lengthx = 0.12;
+    lengthy = 0.1;
+    lengthz = 0.12;
     // Create a buffer for the camera's vertex positions.
 
     const positionBuffer = gl.createBuffer();
@@ -115,15 +122,17 @@ function Coin(gl, zl) {
         color: colorBuffer,
         indices: indexBuffer,
         r: 3,
-        // a: theta,
         z: zl,
-        // speed: speed,
-        // normal: normalBuffer,
-        // textureCoord: textureCoordBuffer,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
     };
 }
 
-function drawCoins(gl, programInfo, buffers, deltaTime) {
+function drawCoins(gl, programInfo, buffers, deltaTime, repos) {
     // while(buffers.a<0)
     // {
     //     buffers.a += Math.PI;
@@ -161,8 +170,12 @@ function drawCoins(gl, programInfo, buffers, deltaTime) {
 //when player in air cameraR stays same 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [0, cameraR-2.27, 0]);  // amount to translate
-
+        [0, cameraR-2.27+fly, 0]);  // amount to translate
+        
+        buffers.posx=0.0;
+        buffers.posy=cameraR-2.27+fly;
+        buffers.posz=cameraPositionz+buffers.z+repos*10;
+        
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians
@@ -174,7 +187,7 @@ function drawCoins(gl, programInfo, buffers, deltaTime) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
+        [-0.0, 0.0, cameraPositionz+buffers.z+repos*10]); // amount to translate
 
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate

@@ -1,4 +1,11 @@
 function Pillar(gl, zl) {
+    posxl=-0.6;
+    posxr=0.6;
+    posy=0.0;
+    posz= 0.0;
+    lenthz=2.0;
+    lengthx=0.4;
+    lengthy=2.8;
     // Create a buffer for the camera's vertex positions.
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
@@ -443,6 +450,13 @@ function Pillar(gl, zl) {
         // speed: speed,
         normal: normalBuffer,
         textureCoord: textureCoordBuffer,
+        posxl: posxl,
+        posxr: posxr,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
     };
 }
 
@@ -486,14 +500,10 @@ function drawPillars(gl, programInfo, buffers, deltaTime) {
         modelViewMatrix,     // matrix to translate
         [0, cameraR, 0]);  // amount to translate
 
-    // mat4.rotate(modelViewMatrix,  // destination matrix
-    //     modelViewMatrix,  // matrix to rotate
-    //     -cameraA-Math.PI/2,     // amount to rotate in radians
-    //     [0, 0, 1]);       // axis to rotate around (Z)
-    //
-    // mat4.translate(modelViewMatrix,     // destination matrix
-    //     modelViewMatrix,     // matrix to translate
-    //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
+        // posxleft=-0.6;
+        // posxright=0.6;
+        buffers.posy=0.11+cameraR;
+        buffers.posz= cameraPositionz+buffers.z;
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
@@ -552,11 +562,9 @@ function drawPillars(gl, programInfo, buffers, deltaTime) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 
     // Tell WebGL to use our program when drawing
-
     gl.useProgram(programInfo.program);
 
     // Set the shader uniforms
-
     gl.uniformMatrix4fv(
         programInfo.uniformLocations.projectionMatrix,
         false,
@@ -617,6 +625,8 @@ function drawPillarsTexture(gl, programInfo, buffers, deltaTime, wallTexture) {
         modelViewMatrix,     // matrix to translate
         [0, cameraR, 0]);  // amount to translate
     
+    buffers.posy=0.11+cameraR;
+    buffers.posz= cameraPositionz+buffers.z;
     // mat4.translate(modelViewMatrix,     // destination matrix
     //         modelViewMatrix,     // matrix to translate
     //         [buffers.lane, 0, 0]);

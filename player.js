@@ -2,12 +2,17 @@ var playerX=0.0;
 var playerY=0.0;
 var playerR=0.0;
 duckTimer =0.0;
-gravity = 0.03;
-if (playerY==1)
-height=1;
-if(playerY==0.0)
-height=0;
+var updatefly=0;
+var updatejump=0;
+
+
 function Player(gl, zl) {
+    posx= 0.0;
+    posy= 0.0;
+    posz= zl;
+    lengthx = 0.3;
+    lengthy =0.4;
+    lengthz =0.3;
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -205,9 +210,13 @@ function Player(gl, zl) {
         color: colorBuffer,
         indices: indexBuffer,
         r: 3,
-        // a: theta,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
         z: zl,
-        // speed: speed,
         normal: normalBuffer,
         textureCoord: textureCoordBuffer,
     };
@@ -216,7 +225,8 @@ function Player(gl, zl) {
 function drawPlayer(gl, programInfo, buffers, deltaTime) {
 
     if (playerY > 0.0){
-        playerY -= gravity;
+        playerY -= gravity*2;
+        // console.log(gravity, playerY);
     }
 
     if(playerY <= 0){
@@ -229,6 +239,29 @@ function drawPlayer(gl, programInfo, buffers, deltaTime) {
     if(duckTimer>=2.0){
         playerR=0.0;
         duckTimer=0.0;
+    }
+
+    if(fly>0){
+        // cameraR=2.4;
+        updatefly++;
+        if(updatefly>17){
+            // cameraR -= gravity*4;
+            fly-= gravity*4;
+            updatefly=0;
+        }
+    }
+
+    if(fly<0){
+        // cameraR=0.8;
+        fly=0;
+    }
+
+    if(jump>0){
+        updatejump++;
+        if(updatejump>555){
+            updatejump=0;
+            jump=0;
+        }
     }
 
     // while(buffers.a<0)
@@ -281,12 +314,14 @@ function drawPlayer(gl, programInfo, buffers, deltaTime) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [playerX, playerY, buffers.z]);  // amount to translate
+        [playerX, playerY+fly, buffers.z]);  // amount to translate
+        buffers.posy=playerY+cameraR-2.4+fly;
+        buffers.posx=playerX;
 
     mat4.rotate(modelViewMatrix,  // destination matrix
         modelViewMatrix,  // matrix to rotate
-        playerR,     // amount to rotate in radians
-        [1, height, 0]);       // axis to rotate around (Z)
+        playerR,   // amount to rotate in radians
+        [1, 0, 0]);       // axis to rotate around (Z)
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     tunnelRotation,// amount to rotate in radians
@@ -364,7 +399,7 @@ function drawPlayer(gl, programInfo, buffers, deltaTime) {
 function drawPlayerTexture(gl, programInfo, buffers, deltaTime, playTexture) {
 
     if (playerY > 0.0){
-        playerY -= gravity;
+        playerY -= gravity*2;
     }
 
     if(playerY <= 0){
@@ -378,7 +413,28 @@ function drawPlayerTexture(gl, programInfo, buffers, deltaTime, playTexture) {
         playerR=0.0;
         duckTimer=0.0;
     }
+    if(fly>0){
+        // cameraR=2.4;
+        updatefly++;
+        if(updatefly>17){
+            // cameraR -= gravity*4;
+            fly-= gravity*4;
+            updatefly=0;
+        }
+    }
 
+    if(fly<0){
+        // cameraR=0.8;
+        fly=0;
+    }
+
+    if(jump>0){
+        updatejump++;
+        if(updatejump>555){
+            updatejump=0;
+            jump=0;
+        }
+    }
     // while(buffers.a<0)
     // {
     //     buffers.a += Math.PI;
@@ -410,7 +466,8 @@ function drawPlayerTexture(gl, programInfo, buffers, deltaTime, playTexture) {
     // Set the drawing position to the "identity" point, which is
     // the center of the scene.
     const modelViewMatrix = mat4.create();
-
+    buffers.posy=playerY+cameraR-2.4;
+    buffers.posx=playerX;
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
 //when player in air cameraR stays same 
@@ -429,7 +486,10 @@ function drawPlayerTexture(gl, programInfo, buffers, deltaTime, playTexture) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [playerX, playerY, buffers.z]);  // amount to translate
+        [playerX, playerY+fly, buffers.z]);  // amount to translate
+        
+        buffers.posy=playerY+cameraR-2.4+fly;
+        buffers.posx=playerX;
 
     mat4.rotate(modelViewMatrix,  // destination matrix
         modelViewMatrix,  // matrix to rotate

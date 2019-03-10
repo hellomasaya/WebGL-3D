@@ -1,8 +1,4 @@
-function Flyboost(gl, zl) {
-    posx=0;
-    posy=0;
-    posz=0;
-    lengthx=0.24;
+function Target(gl, zl) {
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -87,7 +83,6 @@ function Flyboost(gl, zl) {
                 
                   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals),
                                 gl.STATIC_DRAW);
-                
     // Create a buffer for the camera's vertex positions.
 
     const positionBuffer = gl.createBuffer();
@@ -101,40 +96,40 @@ function Flyboost(gl, zl) {
 
     const positions = [
         // Front face
-        -0.12, -0.12,  0.12,
-        0.12, -0.12,  0.12,
-        0.12,  0.12,  0.12,
-        -0.12,  0.12,  0.12,
+        -2.0,0.0,  0.2,
+        2.0,0.0,  0.2,
+        2.0, 1.5,  0.2,
+        -2.0, 1.5,  0.2,
 
         // Back face
-        -0.12, -0.12, -0.12,
-        -0.12,  0.12, -0.12,
-        0.12,  0.12, -0.12,
-        0.12, -0.12, -0.12,
+        -2.0,0.0, -0.2,
+        -2.0, 1.5, -0.2,
+        2.0, 1.5, -0.2,
+        2.0,0.0, -0.2,
 
         // Top face
-        -0.12,  0.12, -0.12,
-        -0.12,  0.12,  0.12,
-        0.12,  0.12,  0.12,
-        0.12,  0.12, -0.12,
+        -2.0, 1.5, -0.2,
+        -2.0, 1.5,  0.2,
+        2.0, 1.5,  0.2,
+        2.0, 1.5, -0.2,
 
         // Bottom face
-        -0.12, -0.12, -0.12,
-        0.12, -0.12, -0.12,
-        0.12, -0.12,  0.12,
-        -0.12, -0.12,  0.12,
+        -2.0,0.0, -0.2,
+        2.0,0.0, -0.2,
+        2.0,0.0,  0.2,
+        -2.0,0.0,  0.2,
 
         // Right face
-        0.12, -0.12, -0.12,
-        0.12,  0.12, -0.12,
-        0.12,  0.12,  0.12,
-        0.12, -0.12,  0.12,
+        2.0,0.0, -0.2,
+        2.0, 1.5, -0.2,
+        2.0, 1.5,  0.2,
+        2.0,0.0,  0.2,
 
         // Left face
-        -0.12, -0.12, -0.12,
-        -0.12, -0.12,  0.12,
-        -0.12,  0.12,  0.12,
-        -0.12,  0.12, -0.12,
+        -2.0,0.0, -0.2,
+        -2.0,0.0,  0.2,
+        -2.0, 1.5,  0.2,
+        -2.0, 1.5, -0.2,
     ];
 
     // Now pass the list of positions into WebGL to build the
@@ -147,17 +142,12 @@ function Flyboost(gl, zl) {
     // for each face.
 
     const faceColors = [
-    // Front face: white
-    [0.0,  0.0,  1.0,  1.0],    // Front face: white
-    [0.0,  0.0,  1.0,  1.0],    // Front face: white
-    [0.0,  0.0,  1.0,  1.0],    // Front face: white
-    [0.0,  0.0,  1.0,  1.0],    // Front face: white
-    [0.0,  0.0,  1.0,  1.0],    // Front face: white
-    [0.0,  0.0,  1.0,  1.0],    // Front face: white
-
-    // Front face: white
-  // Front face: white
-
+        [126/255,  42/255,  44/255,  1.0],    // Front face: white
+        [126/255,  42/255,  44/255,  1.0],    // Front face: white
+        [126/255,  42/255,  44/255,  1.0],    // Front face: white
+        [126/255,  42/255,  44/255,  1.0],    // Front face: white
+        [126/255,  42/255,  44/255,  1.0],    // Front face: white
+        [126/255,  42/255,  44/255,  1.0],    // Front face: white
     ];
 
     // Convert the array of colors into a table for all the vertices.
@@ -201,41 +191,22 @@ function Flyboost(gl, zl) {
 
     // theta = Math.random() * (Math.PI);
     // speed = (Math.random() * (10)-5);
-    lane = Math.floor((Math.random() * (3))); //lane 0=middle  or 2=left
-    if (lane==1) lane =-1.2;
+    lane = Math.floor((Math.random() * (3))); //lane 0=middle or 1=right or 2=left
+    if (lane==1) lane =1.2;
     if (lane==2) lane =-1.2;
 
     return {
         position: positionBuffer,
         color: colorBuffer,
         indices: indexBuffer,
-        // r: 3,
-        lane: lane,
-        posx: posx,
-        posy: posy,
-        posz: posz,
-        lengthx: lengthx,
+        // lane: lane,
         z: zl,
-        // speed: speed,
         normal: normalBuffer,
         textureCoord: textureCoordBuffer,
     };
 }
 
-function drawFlyboost(gl, programInfo, buffers, deltaTime) {
-    // while(buffers.a<0)
-    // {
-    //     buffers.a += Math.PI;
-    // }
-    // while(buffers.a>=Math.PI){
-    //     buffers.a -= Math.PI;
-    // }
-    // Create a perspective matrix, a special matrix that is
-    // used to simulate the distortion of perspective in a camera.
-    // Our field of view is 45 degrees, with a width/height
-    // ratio that matches the display size of the canvas
-    // and we only want to see objects between 0.1 units
-    // and 100 units away from the camera.
+function drawTargets(gl, programInfo, buffers, deltaTime) {
 
     const fieldOfView = 45 * Math.PI / 180;   // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -255,27 +226,17 @@ function drawFlyboost(gl, programInfo, buffers, deltaTime) {
     // the center of the scene.
     const modelViewMatrix = mat4.create();
 
-    // if(lane ==1){
-    //     mat4.translate(modelViewMatrix,     // destination matrix
-    //         modelViewMatrix,     // matrix to translate
-    //         [-1.2, 0, 0]);
-    // }
-    // if(lane ==3){
-    mat4.translate(modelViewMatrix,     // destination matrix
-        modelViewMatrix,     // matrix to translate
-        [buffers.lane, 0, 0]);
-    // }
+    // mat4.translate(modelViewMatrix,     // destination matrix
+    //     modelViewMatrix,     // matrix to translate
+    //     [buffers.lane, 0, 0]);
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
 //when player in air cameraR stays same 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [0, cameraR-2.27, 1.5]);  // amount to translate
+        [0, cameraR-2.27, 0]);  // amount to translate
 
-        buffers.posx= buffers.lane;
-        buffers.posy= cameraR-2.27;
-        buffers.posz= 1.5+cameraPositionz+buffers.z;
-        // mat4.rotate(modelViewMatrix,  // destination matrix
+    // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians
     //     [0, 0, 1]);       // axis to rotate around (Z)
@@ -367,20 +328,7 @@ function drawFlyboost(gl, programInfo, buffers, deltaTime) {
 }
 
 
-function drawFlyboostTexture(gl, programInfo, buffers, deltaTime, flyTexture) {
-    // while(buffers.a<0)
-    // {
-    //     buffers.a += Math.PI;
-    // }
-    // while(buffers.a>=Math.PI){
-    //     buffers.a -= Math.PI;
-    // }
-    // Create a perspective matrix, a special matrix that is
-    // used to simulate the distortion of perspective in a camera.
-    // Our field of view is 45 degrees, with a width/height
-    // ratio that matches the display size of the canvas
-    // and we only want to see objects between 0.1 units
-    // and 100 units away from the camera.
+function drawTargetsTexture(gl, programInfo, buffers, deltaTime, targetTexture) {
 
     const fieldOfView = 45 * Math.PI / 180;   // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -400,19 +348,16 @@ function drawFlyboostTexture(gl, programInfo, buffers, deltaTime, flyTexture) {
     // the center of the scene.
     const modelViewMatrix = mat4.create();
 
+    // mat4.translate(modelViewMatrix,     // destination matrix
+    //     modelViewMatrix,     // matrix to translate
+    //     [buffers.lane, 0, 0]);
     // Now move the drawing position a bit to where we want to
     // start drawing the square.
 //when player in air cameraR stays same 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [0, cameraR-2.27, 1.5]);  // amount to translate
-    
-    mat4.translate(modelViewMatrix,     // destination matrix
-            modelViewMatrix,     // matrix to translate
-            [buffers.lane, 0, 0]);
-            buffers.posx= buffers.lane;
-            buffers.posy= cameraR-2.27;
-            buffers.posz= 1.5+cameraPositionz+buffers.z;
+        [0, cameraR-2.27, 0]);  // amount to translate
+
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians
@@ -425,16 +370,7 @@ function drawFlyboostTexture(gl, programInfo, buffers, deltaTime, flyTexture) {
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
         [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
-    // if(lane ==1){
-    //     mat4.translate(modelViewMatrix,     // destination matrix
-    //         modelViewMatrix,     // matrix to translate
-    //         [-1.2, 0, 0]);
-    // }
-    // else if(lane ==3){
-    //     mat4.translate(modelViewMatrix,     // destination matrix
-    //         modelViewMatrix,     // matrix to translate
-    //         [1.2, 0, 0]);
-    // }
+
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     buffers.a+tunnelRotation-cameraA,     // amount to rotate in radians
@@ -463,21 +399,20 @@ function drawFlyboostTexture(gl, programInfo, buffers, deltaTime, flyTexture) {
         gl.enableVertexAttribArray(
             programInfo.attribLocations.vertexPosition);
     }
-
-        // tell webgl how to pull out the texture coordinates from buffer
-        {
-            const num = 2; // every coordinate composed of 2 values
-            const type = gl.FLOAT; // the data in the buffer is 32 bit float
-            const normalize = false; // don't normalize
-            const stride = 0; // how many bytes to get from one set to the next
-            const offset = 0; // how many bytes inside the buffer to start from
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
-            gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
-            gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
-        }
+ // tell webgl how to pull out the texture coordinates from buffer
+ {
+    const num = 2; // every coordinate composed of 2 values
+    const type = gl.FLOAT; // the data in the buffer is 32 bit float
+    const normalize = false; // don't normalize
+    const stride = 0; // how many bytes to get from one set to the next
+    const offset = 0; // how many bytes inside the buffer to start from
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.textureCoord);
+    gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, num, type, normalize, stride, offset);
+    gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+}
 // Tell WebGL how to pull out the normals from
-  // the normal buffer into the vertexNormal attribute.
-  {
+// the normal buffer into the vertexNormal attribute.
+    {
     const numComponents = 3;
     const type = gl.FLOAT;
     const normalize = false;
@@ -485,19 +420,19 @@ function drawFlyboostTexture(gl, programInfo, buffers, deltaTime, flyTexture) {
     const offset = 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normal);
     gl.vertexAttribPointer(
-        programInfo.attribLocations.vertexNormal,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset);
+    programInfo.attribLocations.vertexNormal,
+    numComponents,
+    type,
+    normalize,
+    stride,
+    offset);
     gl.enableVertexAttribArray(
-        programInfo.attribLocations.vertexNormal);
-  }
+    programInfo.attribLocations.vertexNormal);
+    }
 
-  const normalMatrix = mat4.create();
-  mat4.invert(normalMatrix, modelViewMatrix);
-  mat4.transpose(normalMatrix, normalMatrix);
+    const normalMatrix = mat4.create();
+    mat4.invert(normalMatrix, modelViewMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
     // Tell WebGL which indices to use to index the vertices
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indices);
 
@@ -508,32 +443,32 @@ function drawFlyboostTexture(gl, programInfo, buffers, deltaTime, flyTexture) {
     // Set the shader uniforms
 
     gl.uniformMatrix4fv(
-        programInfo.uniformLocations.projectionMatrix,
-        false,
-        projectionMatrix);
+    programInfo.uniformLocations.projectionMatrix,
+    false,
+    projectionMatrix);
     gl.uniformMatrix4fv(
-        programInfo.uniformLocations.modelViewMatrix,
+    programInfo.uniformLocations.modelViewMatrix,
+    false,
+    modelViewMatrix);
+    gl.uniformMatrix4fv(
+        programInfo.uniformLocations.normalMatrix,
         false,
-        modelViewMatrix);
-        gl.uniformMatrix4fv(
-            programInfo.uniformLocations.normalMatrix,
-            false,
-            normalMatrix);
-        
-        // Tell WebGL we want to affect texture unit 0
-        gl.activeTexture(gl.TEXTURE0);
+        normalMatrix);
 
-        // Bind the texture to texture unit 0
-        gl.bindTexture(gl.TEXTURE_2D, flyTexture);
+    // Tell WebGL we want to affect texture unit 0
+    gl.activeTexture(gl.TEXTURE0);
 
-        // Tell the shader we bound the texture to texture unit 0
-        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+    // Bind the texture to texture unit 0
+    gl.bindTexture(gl.TEXTURE_2D, targetTexture);
+
+    // Tell the shader we bound the texture to texture unit 0
+    gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
 
     {
-        const vertexCount = 36;
-        const type = gl.UNSIGNED_SHORT;
-        const offset = 0;
-        gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
+    const vertexCount = 36;
+    const type = gl.UNSIGNED_SHORT;
+    const offset = 0;
+    gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
     }
 
     // Update the rotation for the next draw

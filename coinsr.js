@@ -1,92 +1,10 @@
 function Coinr(gl, zl) {
-
-    // NEW
-
-    // const textureCoordBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
-
-    // const textureCoordinates = [
-    //     // Front
-    //     0.0,  0.0,
-    //     1.0,  0.0,
-    //     1.0,  1.0,
-    //     0.0,  1.0,
-    //     // Back
-    //     0.0,  0.0,
-    //     1.0,  0.0,
-    //     1.0,  1.0,
-    //     0.0,  1.0,
-    //     // Top
-    //     0.0,  0.0,
-    //     1.0,  0.0,
-    //     1.0,  1.0,
-    //     0.0,  1.0,
-    //     // Bottom
-    //     0.0,  0.0,
-    //     1.0,  0.0,
-    //     1.0,  1.0,
-    //     0.0,  1.0,
-    //     // Right
-    //     0.0,  0.0,
-    //     1.0,  0.0,
-    //     1.0,  1.0,
-    //     0.0,  1.0,
-    //     // Left
-    //     0.0,  0.0,
-    //     1.0,  0.0,
-    //     1.0,  1.0,
-    //     0.0,  1.0,
-    // ];
-
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
-    //     gl.STATIC_DRAW);
-
-    // // Lighting
-    // const normalBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-
-    // const vertexNormals = [
-
-    //     // Front
-    //     0.0,  0.0,  1.0,
-    //     0.0,  0.0,  1.0,
-    //     0.0,  0.0,  1.0,
-    //     0.0,  0.0,  1.0,
-
-    //     // Back
-    //     0.0,  0.0, -1.0,
-    //     0.0,  0.0, -1.0,
-    //     0.0,  0.0, -1.0,
-    //     0.0,  0.0, -1.0,
-
-    //     // Top
-    //     0.0,  1.0,  0.0,
-    //     0.0,  1.0,  0.0,
-    //     0.0,  1.0,  0.0,
-    //     0.0,  1.0,  0.0,
-
-    //     // Bottom
-    //     0.0, -1.0,  0.0,
-    //     0.0, -1.0,  0.0,
-    //     0.0, -1.0,  0.0,
-    //     0.0, -1.0,  0.0,
-
-    //     // Right
-    //     1.0,  0.0,  0.0,
-    //     1.0,  0.0,  0.0,
-    //     1.0,  0.0,  0.0,
-    //     1.0,  0.0,  0.0,
-
-    //     // Left
-    //     -1.0,  0.0,  0.0,
-    //     -1.0,  0.0,  0.0,
-    //     -1.0,  0.0,  0.0,
-    //     -1.0,  0.0,  0.0
-    // ];
-
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals),
-    //     gl.STATIC_DRAW);
-
+    posx=1.1;
+    posy=0.0;
+    posz=0.0;
+    lengthx = 0.12;
+    lengthy = 0.1;
+    lengthz = 0.12;
     // Create a buffer for the camera's vertex positions.
 
     const positionBuffer = gl.createBuffer();
@@ -206,26 +124,19 @@ function Coinr(gl, zl) {
         r: 3,
         // a: theta,
         z: zl,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
         // speed: speed,
         // normal: normalBuffer,
         // textureCoord: textureCoordBuffer,
     };
 }
 
-function drawCoinsr(gl, programInfo, buffers, deltaTime) {
-    // while(buffers.a<0)
-    // {
-    //     buffers.a += Math.PI;
-    // }
-    // while(buffers.a>=Math.PI){
-    //     buffers.a -= Math.PI;
-    // }
-    // Create a perspective matrix, a special matrix that is
-    // used to simulate the distortion of perspective in a camera.
-    // Our field of view is 45 degrees, with a width/height
-    // ratio that matches the display size of the canvas
-    // and we only want to see objects between 0.1 units
-    // and 100 units away from the camera.
+function drawCoinsr(gl, programInfo, buffers, deltaTime, repos) {
 
     const fieldOfView = 45 * Math.PI / 180;   // in radians
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
@@ -250,8 +161,10 @@ function drawCoinsr(gl, programInfo, buffers, deltaTime) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [0.3, cameraR-2.27, 0]);  // amount to translate
+        [0.0, cameraR-2.37, 0]);  // amount to translate
 
+        buffers.posy=cameraR-2.37;
+        buffers.posz=cameraPositionz+buffers.z;
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians
@@ -263,7 +176,7 @@ function drawCoinsr(gl, programInfo, buffers, deltaTime) {
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
-        [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
+        [0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
 
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
