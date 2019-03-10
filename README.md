@@ -5,7 +5,6 @@ Assignment 3 - Subway Surfer
 
 
 ### Tutorials and Important links:
-==================================
 Some links that helped me do this asssignment:
 - [All tutorials](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL)
 - [Issues with Cross Origin Images](https://webglfundamentals.org/webgl/lessons/webgl-cors-permission.html#toc)
