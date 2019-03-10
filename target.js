@@ -1,4 +1,10 @@
 function Target(gl, zl) {
+    posx=0.0;
+    posy=0.0;
+    posz=0.0;
+    lengthx = 4.0;
+    lengthy =1.5;
+    lengthz =0.4;
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -203,6 +209,12 @@ function Target(gl, zl) {
         z: zl,
         normal: normalBuffer,
         textureCoord: textureCoordBuffer,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
     };
 }
 
@@ -244,7 +256,9 @@ function drawTargets(gl, programInfo, buffers, deltaTime) {
     // mat4.translate(modelViewMatrix,     // destination matrix
     //     modelViewMatrix,     // matrix to translate
     //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
-
+    buffers.posx=0;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=cameraPositionz+buffers.z;
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
         [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
@@ -366,7 +380,9 @@ function drawTargetsTexture(gl, programInfo, buffers, deltaTime, targetTexture) 
     // mat4.translate(modelViewMatrix,     // destination matrix
     //     modelViewMatrix,     // matrix to translate
     //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
-
+    buffers.posx=0;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=cameraPositionz+buffers.z;
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
         [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate

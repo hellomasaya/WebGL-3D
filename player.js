@@ -239,6 +239,7 @@ function drawPlayer(gl, programInfo, buffers, deltaTime) {
     if(duckTimer>=2.0){
         playerR=0.0;
         duckTimer=0.0;
+        rot=0;
     }
 
     if(fly>0){
@@ -262,6 +263,14 @@ function drawPlayer(gl, programInfo, buffers, deltaTime) {
             updatejump=0;
             jump=0;
         }
+    }
+
+    if(left || right){
+        presscount+=0.1;
+    }
+    if(presscount>0.5){
+        left=false;
+        right=false;
     }
 
     // while(buffers.a<0)

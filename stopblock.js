@@ -3,7 +3,7 @@ function Stopblock(gl, zl) {
     posy=0.0;
     posz=0.0;
     lengthx = 0.8;
-    lengthy =0.3;
+    lengthy =2.8;
     lengthz =0.18;
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);

@@ -1,5 +1,10 @@
 function Trafficlight(gl, zl) {
-
+    posx=0.0;
+    posy=0.0;
+    posz=0.0;
+    lengthx = 0.09;
+    lengthy =2.5;
+    lengthz =0.092;
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -162,6 +167,12 @@ function Trafficlight(gl, zl) {
         // speed: speed,
         // normal: normalBuffer,
         textureCoord: textureCoordBuffer,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
     };
 }
 
@@ -216,7 +227,9 @@ function drawTrafficlights(gl, programInfo, buffers, deltaTime) {
     // mat4.translate(modelViewMatrix,     // destination matrix
     //     modelViewMatrix,     // matrix to translate
     //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
-
+    buffers.posx=buffers.lane;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=cameraPositionz+buffers.z;
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
         [-0.0, 0.0, cameraPositionz+buffers.z]);  // amount to translate
@@ -344,7 +357,9 @@ mat4.translate(modelViewMatrix,     // destination matrix
 mat4.translate(modelViewMatrix,     // destination matrix
     modelViewMatrix,     // matrix to translate
     [0, cameraR-2.27, 0]);  // amount to translate
-
+    buffers.posx=buffers.lane;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=cameraPositionz+buffers.z;
 // mat4.rotate(modelViewMatrix,  // destination matrix
 //     modelViewMatrix,  // matrix to rotate
 //     -cameraA-Math.PI/2,     // amount to rotate in radians

@@ -7,6 +7,7 @@ cameraR = 0.8;
 cameraA = -Math.PI / 2;
 cameraV = 0;
 gravity = 0.02;
+win=0;
 //objects
 var track;
 var grass;
@@ -36,18 +37,21 @@ var repos_coin=[]; //coinss i.e middle coins
 var repos_coinl=[]; //coins i.e left coins
 var repos_coinr=[]; //coins i.e right coins
 
-//policeman
-policeman=false;
-caught=false;
+var presscount=0;
 
 function callDead() {
-  death = 1;
-  // console.log("dead");
+  // if(dead==false){
   $("#canvasDiv").html("<h1>Game Over</h1>");
   document.getElementById('music').pause();
   document.getElementById('crash').play();
+  // }
 }
 
+function callwin() {
+  $("#canvasDiv").html("<h1>Game Won</h1>");
+  document.getElementById('music').pause();
+  document.getElementById('win').play();
+}
 //collisions - no need of separate functions
 function detectCollision_CoinPlayer(coin, player){
     // console.log("mid",coin.posx);
@@ -105,9 +109,9 @@ function detectCollision_JumpPlayer(jumpboost, player){
 }
 
 function detect_collision(object, player){ //train, stopblock, stoppass, target, pole
-  // console.log(object.posy, player.posy);
+  // console.log("y",object.posy, player.posy);
   if(Math.abs(player.posx - object.posx) < player.lengthx/2+object.lengthx/2
-  && Math.abs(player.posy+0.7299 - object.posy) < player.lengthy/2+object.lengthx/2
+  && Math.abs(player.posy - object.posy) < player.lengthy/2+object.lengthx/2
   && Math.abs(player.posz - object.posz) < player.lengthz/2+object.lengthx/2)
     return 1;
 }
@@ -470,7 +474,7 @@ const programInfoTexBlinkbw = {
     }
     else if(rand >6 && i%50==0){
       trains.push(Train(gl,-i));
-      trains.push(Train(gl,-i-1000));
+      trains.push(Train(gl,-i-2000));
     }
   }
 
@@ -479,14 +483,14 @@ const programInfoTexBlinkbw = {
   Mousetrap.bind('left', function () {
     if(playerX>=0.0)
       playerX += -1.2;
-      // left=true; //for pillar left leg collision
+      left=true; //for pillar left leg collision
 
   });
 
   Mousetrap.bind('right', function () {
     if(playerX<=0.0)
       playerX += 1.2;
-      // right=true; //for piller right leg collision
+      right=true; //for piller right leg collision
   });
 
   Mousetrap.bind('up', function () {
@@ -497,6 +501,8 @@ const programInfoTexBlinkbw = {
   Mousetrap.bind('down', function () {
     if(playerR==0.0)
     playerR += 1.57;
+    if(rot==0)
+      rot+=1;
   });
 
   Mousetrap.bind('t', function () {
@@ -517,7 +523,7 @@ const programInfoTexBlinkbw = {
 
   // Draw the scene repeatedly
   function render(now) {
-// console.log(hit);
+// console.log(hit, rot);
 
     // console.log(jump);
     // console.log(repos_coinr);
@@ -629,6 +635,10 @@ const programInfoTexBlinkbw = {
       else
         drawTargets(gl, programInfo, target, deltaTime);
     }
+
+    if(detect_collision(target, player)){
+      callwin();
+    }
     //camera
     drawCamera(gl, programInfo, camera, deltaTime);
 
@@ -731,9 +741,9 @@ const programInfoTexBlinkbw = {
         drawStoppass(gl, programInfo, stoppass[j], deltaTime);
       }
 
-      // if(detect_collision(stoppass[j], player)){
-      //   hit+=1;
-      // }
+      if(detect_collision(stoppass[j], player) && rot==0){
+        hit+=1;
+      }
     }
 //train
     for (j = 0; j < trains.length; ++j) {
@@ -760,6 +770,10 @@ const programInfoTexBlinkbw = {
         drawTrafficlightsTexture(gl, programInfoTexture, trafficlights[j], deltaTime, poleTexture);
       else
         drawTrafficlights(gl, programInfo, trafficlights[j], deltaTime);
+
+      if(detect_collision(trafficlights[j], player)){
+          callDead();
+        }
     }
 
 //jumpboost

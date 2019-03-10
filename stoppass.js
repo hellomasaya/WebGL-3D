@@ -498,7 +498,7 @@ function drawStoppass(gl, programInfo, buffers, deltaTime) {
             modelViewMatrix,     // matrix to translate
             [buffers.lane, 0, 0]);
             buffers.posx=buffers.lane;
-            buffers.posy=cameraR-2.27;
+            buffers.posy=cameraR-2.27+0.11;
             buffers.posz=cameraPositionz+buffers.z;
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
@@ -643,7 +643,9 @@ function drawStoppassTexture(gl, programInfo, buffers, deltaTime, passTexture) {
     mat4.translate(modelViewMatrix,     // destination matrix
             modelViewMatrix,     // matrix to translate
             [buffers.lane, 0, 0]);
-
+            buffers.posx=buffers.lane;
+            buffers.posy=cameraR-2.27+0.11;
+            buffers.posz=cameraPositionz+buffers.z;
     // mat4.rotate(modelViewMatrix,  // destination matrix
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians

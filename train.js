@@ -1,4 +1,10 @@
 function Train(gl, zl) {
+    posx=0.0;
+    posy=0.0;
+    posz=0.0;
+    lengthx = 0.8;
+    lengthy =0.3;
+    lengthz =8.0;
     const textureCoordBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   
@@ -203,6 +209,12 @@ function Train(gl, zl) {
         z: zl,
         normal: normalBuffer,
         textureCoord: textureCoordBuffer,
+        posx: posx,
+        posy: posy,
+        posz: posz,
+        lengthx: lengthx,
+        lengthy: lengthy,
+        lengthz: lengthz,
     };
 }
 
@@ -244,6 +256,9 @@ function drawTrains(gl, programInfo, buffers, deltaTime) {
     // mat4.translate(modelViewMatrix,     // destination matrix
     //     modelViewMatrix,     // matrix to translate
     //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
+    buffers.posx=buffers.lane;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=4*cameraPositionz+buffers.z;
 
     mat4.translate(modelViewMatrix,     // destination matrix
         modelViewMatrix,     // matrix to translate
@@ -362,7 +377,10 @@ function drawTrainsTexture(gl, programInfo, buffers, deltaTime, trainTexture) {
     //     modelViewMatrix,  // matrix to rotate
     //     -cameraA-Math.PI/2,     // amount to rotate in radians
     //     [0, 0, 1]);       // axis to rotate around (Z)
-    //
+    //    
+    buffers.posx=buffers.lane;
+    buffers.posy=cameraR-2.27;
+    buffers.posz=4*cameraPositionz+buffers.z;
     // mat4.translate(modelViewMatrix,     // destination matrix
     //     modelViewMatrix,     // matrix to translate
     //     [-cameraR*Math.cos(cameraA), -cameraR*Math.sin(cameraA), 0]);  // amount to translate
