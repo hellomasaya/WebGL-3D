@@ -51,7 +51,7 @@ function loadTexture(gl, url) {
     };
     image.src = url;
     image.crossOrigin = "anonymous";
-
+    //cors ^
     return texture;
 }
 
