@@ -5,9 +5,9 @@ Assignment 3 - Subway Surfer
 
 ### Run:
 
-- python -m SimpleHTTPServer
-- Open browser
-- http://localhost:8000/
+    python -m SimpleHTTPServer
+    ## Open browser
+    http://localhost:8000/
 
 ### Controls:
 
